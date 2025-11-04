@@ -5,7 +5,7 @@ description: "Discover what a personal injury lawyer does, how they help acciden
 author: Mary
 image: '/images/what-does-a-personal-injury-lawyer-actually-do.webp'
 # image_caption: 'Photo by [Luigi Estuye](https://unsplash.com/photos/HVK4t3leM1I) on [Unsplash](https://unsplash.com/)'
-tags: [Personal Injury Law]
+tags: [Personal Injury]
 featured: false
 ---
 
