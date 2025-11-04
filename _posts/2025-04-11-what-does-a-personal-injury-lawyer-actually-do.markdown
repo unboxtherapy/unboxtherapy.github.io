@@ -9,9 +9,7 @@ tags: [Personal Injury Law]
 featured: false
 ---
 
-If you’ve ever been in an accident or suffered an injury caused by someone else’s carelessness, you’ve likely been told to contact a personal injury lawyer. 
-
-But what exactly does a personal injury lawyer do? This beginner’s guide explains their role, how they handle your claim, and why hiring one can be crucial for securing fair compensation in the USA.
+If you’ve ever been in an accident or suffered an injury caused by someone else’s carelessness, you’ve likely been told to contact a personal injury lawyer. But what exactly does a personal injury lawyer do? This beginner’s guide explains their role, how they handle your claim, and why hiring one can be crucial for securing fair compensation in the USA.
 
 ---
 
