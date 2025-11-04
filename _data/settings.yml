@@ -1,16 +1,16 @@
 #-------------------------------
 # Site Settings
-title: Hopkins Public Health in AI
+title: Ur Lawyer
 logo: # You can add own logo. For example "/images/logo.png".
-description: JSPH AI Student Blog
+description: your trusted guide to U.S. law. Learn about personal injury, divorce, immigration, employment, criminal, tax, and accident lawyers. Get practical legal advice for every situation.
 
 
 #-------------------------------
 # Author Global Settings
 author:
-  author__name: Hopkins Public Health in AI
-  author__bio: Hi there! We're students at Hopkins exploring the intersection between Public Health and AI.
-  author__avatar: /images/01-1.jpg
+  author__name: Ur Lawyer Garen
+  author__bio: I worked for 12 years in Los Angeles and San Francisco Bay Area as a trial lawyer, mainly in criminal defense but also as a plaintiff's lawyer in Asbestos related civil litigation
+  author__avatar: /images/Lawyer-Garen.webp
 
 
 #-------------------------------
@@ -34,14 +34,15 @@ menu__settings:
 #-------------------------------
 # Hero Settings
 hero:
-  hero__title: We're a collective of students from Hopkins School of Public Health writing about Public Health and AI.
+  hero__title: Your Trusted Legal Guide for Every Case in the U.S
 
 
 #-------------------------------
 # Blog Settings
 blog:
   blog__title: Blog & Resources
-  blog__description: Find out how to set up a successful blog or how to make yours even better!
+  blog__description: Learn about personal injury, divorce, immigration, employment, criminal, tax, and accident lawyers. Get practical legal advice for every situation.
+
 
 
 #-------------------------------
