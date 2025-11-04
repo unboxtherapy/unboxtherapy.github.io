@@ -2,7 +2,7 @@
 layout: post
 title: "What Does a Personal Injury Lawyer Actually Do? A Beginner’s Guide"
 description: "Discover what a personal injury lawyer does, how they help accident victims in the USA, and why hiring one can improve your chances of fair compensation."
-author: Ur Lawyer Mary
+author: Mary
 image: '/images/what-does-a-personal-injury-lawyer-actually-do.webp'
 # image_caption: 'Photo by [Luigi Estuye](https://unsplash.com/photos/HVK4t3leM1I) on [Unsplash](https://unsplash.com/)'
 tags: [Personal Injury Law]
