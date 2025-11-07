@@ -6,7 +6,7 @@ description: Contact Ur Lawyer for legal information, guidance, and lawyer resea
 image: '/images/contact.webp'
 ---
 
-Welcome to **Ur-Lawyer.github.io** – your trusted online guide for understanding legal topics in the United States.  
+Welcome to **[Ur-Lawyer](https://ur-lawyer.github.io/)** – your trusted online guide for understanding legal topics in the United States.  
 We do **not provide direct legal representation**, but we offer **information, research guidance, and educational content** to help you make informed decisions when seeking the right lawyer for your case.
 
 If you have questions, content suggestions, collaboration requests, or need help understanding a legal topic, we’d love to hear from you.
