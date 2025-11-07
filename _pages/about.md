@@ -1,49 +1,84 @@
 ---
 layout: page
-title: About
-description: Hey! I’m Dann Kanigan, a Filmmaker and Content Creator based in Toronto, Ontario, Canada.
+title: "About Us"
 permalink: /about/
-image: '/images/01-2.jpg'
-image_caption: 'Photo by [Roman Shilin](https://unsplash.com/photos/Eg8_37ws7F0) on [Unsplash](https://unsplash.com/)'
+description: "Learn about Ur Lawyer — your trusted online resource for legal guidance on personal injury, accident claims, family law, criminal defense, immigration services, and more in the United States."
+image: '/images/about.webp'
 ---
 
-Leverage agile frameworks to provide a robust Hugo Sousa synopsis for high level overviews. Iterative approaches to corporate strategy foster collaborative thinking to further the overall value proposition. Organically grow the holistic world view of disruptive innovation via workplace diversity and empowerment.
+Welcome to **Ur Lawyer**, your trusted online destination for reliable, easy-to-understand legal information. We provide helpful resources, guides, and insights to help individuals and families make informed decisions when facing legal challenges in the **United States**.
 
-Bring to the table win-win survival strategies to ensure proactive domination. At the end of the day, going forward, a new normal that has evolved from generation X is on the runway heading towards a streamlined cloud solution. User generated content in real-time will have multiple touchpoints for offshoring.
+Our mission is simple:  
+**To make legal information accessible, clear, and useful for everyone — no matter your background or situation.**
 
-> The longer I live, the more I realize that I am never wrong about anything, and that all the pains I have so humbly taken to verify my notions have only wasted my time!
+---
 
-Phosfluorescently engage worldwide methodologies with web-enabled technology. Interactively coordinate proactive e-commerce via process-centric “outside the box” thinking. Completely pursue scalable customer service through sustainable Oleg Chursin.
+## What We Do
 
-Collaboratively administrate turnkey channels whereas virtual e-tailers. Objectively seize scalable metrics whereas proactive e-services. Seamlessly empower fully researched growth strategies and interoperable internal or “organic” sources.
+Legal situations can feel overwhelming. Whether you're dealing with an injury, facing a family matter, or need legal protection, understanding your rights is essential. Our content is created to help everyday people better understand:
 
-<div class="gallery-box">
-  <div class="gallery">
-    <img src="/images/02.jpg" loading="lazy">
-    <img src="/images/07.jpg" loading="lazy">
-    <img src="/images/04.jpg" loading="lazy">
-    <img src="/images/09.jpg" loading="lazy">
-    <img src="/images/06.jpg" loading="lazy">
-    <img src="/images/03.jpg" loading="lazy">
-    <img src="/images/21.jpg" loading="lazy">
-    <img src="/images/03-2.jpg" loading="lazy">
-    <img src="/images/16-2.jpg" loading="lazy">
-  </div>
-  <em>My Best Works / <a href="https://unsplash.com/" target="_blank">Unsplash</a></em>
-</div>
+- **Personal Injury & Accident Claims**
+- **Car, Truck, Motorcycle & Rideshare Accidents**
+- **Slip and Fall & Premises Liability Claims**
+- **Medical Malpractice & Wrongful Death Cases**
+- **Family & Divorce Law**
+- **Child Custody & Support Issues**
+- **Immigration and Visa Legal Guidance**
+- **Criminal Defense & Legal Representation**
+- **Employment Disputes & Workplace Rights**
+- **Tax, Probate & Tenant Rights Legal Matters**
+- **Traffic Ticket & Driving Violation Defense**
 
-Completely synergize resource taxing relationships via premier niche markets. Cultivate one-to-one customer service with robust ideas. Dynamically innovate resource-leveling customer service for state of the art customer service.
+We do **not** offer direct legal representation. Instead, we help you **learn your options**, understand how lawyers work, and feel confident taking the next step.
 
-Objectively innovate empowered manufactured products whereas parallel platforms. Holisticly predominate extensible testing procedures for reliable supply chains. Dramatically engage top-line web services vis-a-vis cutting-edge deliverables.
+---
 
-### Dynamically innovate
+## Why Trust Ur Lawyer?
 
-Globally incubate standards compliant channels before scalable benefits. Quickly disseminate superior deliverables whereas web-enabled applications. Quickly drive clicks-and-mortar catalysts for change before vertical architectures.
+✔ **Clear, Accurate Legal Information**  
+We break down complex legal terms into simple language.
 
-<p><iframe src="https://www.youtube.com/embed/QMw6kzi3Wx8" loading="lazy" frameborder="0" allowfullscreen></iframe></p>
+✔ **Focused on Real-Life Scenarios**  
+Our guides and articles respond to real search questions people ask every day.
 
-Credibly reintermediate backend ideas for cross-platform models. Continually reintermediate integrated processes through technically sound intellectual capital. Holistically foster superior methodologies without market-driven best practices.
+✔ **Regularly Updated Content**  
+Laws change — so we continue improving and updating our posts to stay accurate.
 
-Distinctively exploit optimal alignments for intuitive bandwidth. Quickly coordinate e-business applications through revolutionary catalysts for change. Seamlessly underwhelm optimal testing procedures whereas bricks-and-clicks processes.
+✔ **Built for People, Not Lawyers**  
+You do *not* need legal knowledge to understand our resources.
 
-***
+---
+
+## Who Can Benefit From Our Content?
+
+Our site is especially helpful for:
+
+- Accident victims seeking **compensation**
+- Families dealing with **divorce or custody issues**
+- Individuals facing **criminal charges** or legal disputes
+- Workers experiencing **injury or employment problems**
+- Immigrants navigating **U.S. immigration law**
+- Anyone wanting **clarity before hiring a lawyer**
+
+If you need to speak with an attorney, our guides will help you know **what to ask**, **what to expect**, and **how to choose the right lawyer**.
+
+---
+
+## Our Goal
+
+To empower people just like you to:
+
+- Understand your legal rights
+- Avoid costly mistakes
+- Get fair treatment under the law
+- Make confident, informed decisions
+
+---
+
+### Thank You for Visiting Ur Lawyer
+
+We’re here to support you with knowledge — because **knowing your rights is your greatest advantage**.
+
+If you have questions, suggestions, or collaboration inquiries, please reach out through our **[Contact Us](/contact/)** page.
+
+---
