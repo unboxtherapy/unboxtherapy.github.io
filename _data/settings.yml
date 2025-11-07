@@ -1,7 +1,7 @@
 #-------------------------------
 # Site Settings
 title: Ur Lawyer
-logo: # You can add own logo. For example "/images/logo.png".
+logo: /images/logo.webp
 description: your trusted guide to U.S. law. Learn about personal injury, divorce, immigration, employment, criminal, tax, and accident lawyers. Get practical legal advice for every situation.
 
 
