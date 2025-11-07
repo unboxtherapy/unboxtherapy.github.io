@@ -5,7 +5,7 @@ permalink: /privacy-policy/
 description: "Privacy Policy for Ur-Lawyer explaining how we collect, use, and protect visitor information. Learn how personal data is handled on our legal information website."
 ---
 
-This Privacy Policy describes how **[Ur-Lawyer](https://ur-lawyer.github.io/)** collects, uses, and protects the personal information of visitors. By using this website, you agree to the terms outlined below.
+This Privacy Policy describes how [**Ur-Lawyer**](https://ur-lawyer.github.io/) collects, uses, and protects the personal information of visitors. By using this website, you agree to the terms outlined below.
 
 We aim to provide helpful legal information about various areas such as **personal injury lawyers, accident lawyers, divorce lawyers, immigration lawyers, family lawyers, criminal lawyers, medical malpractice lawyers, employment lawyers, child custody lawyers, tax lawyers, probate lawyers, traffic ticket lawyers, tenant lawyers, truck accident lawyers, car accident lawyers, and slip and fall lawyers** in the United States.  
 However, we **do not request or store personal legal case details**.
