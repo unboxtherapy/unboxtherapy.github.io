@@ -32,7 +32,7 @@ In short, if you’ve been injured because someone else was careless, a personal
 
 Many people think lawyers only appear in court, but personal injury attorneys perform a wide range of tasks behind the scenes. Here’s what they typically do for clients in the USA:
 
-![Girls]({{site.baseurl}}/images/What-Does-Personal-Injury-Lawyer-Actually-Do.webp){:loading="lazy"}
+![Lawyers Talking]({{site.baseurl}}/images/What-Does-Personal-Injury-Lawyer-Actually-Do.webp){:loading="lazy"}
 <!-- *Photo by [Matheus Ferrero](https://unsplash.com/photos/LIaLQ2SIQuk) on [Unsplash](https://unsplash.com/)* -->
 
 ### 1. Offer a Free Case Evaluation
