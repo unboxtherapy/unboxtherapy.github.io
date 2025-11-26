@@ -74,6 +74,10 @@ Users are seeing AI-generated influencers gaining:
 
 without showing their real face.
 
+[>>> Get EarlyBird Discount & 300+ Bonus Bundle (worth $43k) <<<](https://jvz6.com/c/3273109/428971)
+![The AI Influencer Company]({{ site.baseurl }}/images/viral-influencer-ai-2025-review.gif)
+
+
 ---
 
 ## Key Features
@@ -104,6 +108,9 @@ This product is ideal for:
 * People who want to grow without showing their face
 
 If you want to build an influencer audience quickly, this tool can help you start.
+
+[![Who Is This For]({{ site.baseurl }}/images/Who-Is-This-For.webp)](https://jvz6.com/c/3273109/428971)
+
 
 ---
 
