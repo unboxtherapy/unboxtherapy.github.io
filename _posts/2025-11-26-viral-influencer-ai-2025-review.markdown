@@ -32,7 +32,9 @@ This product claims to help you:
 
 This review will break down the promises, features, and real results to see if it truly works.
 
+[
 ![The AI Influencer Company]({{ site.baseurl }}/images/viral-influencer-ai-2025-review.gif)
+](https://jvz6.com/c/3273109/428971)
 
 
 ---
@@ -54,7 +56,9 @@ providing tools to launch and grow your own AI-based influencer brand.
 
 ---
 
-![The AI Influencer Company]({{ site.baseurl }}/images/The-AI-Influencer-Company.webp)(https://jvz6.com/c/3273109/428971)
+[
+    ![The AI Influencer Company]({{ site.baseurl }}/images/The-AI-Influencer-Company.webp)
+](https://jvz6.com/c/3273109/428971)
 
 ## Why Viral Influencer AI 2025 Is Trending on TikTok
 
