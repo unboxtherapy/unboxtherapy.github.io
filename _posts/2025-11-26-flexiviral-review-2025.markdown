@@ -39,7 +39,7 @@ Think Dropbox’s “refer-a-friend” loop applied to email list building, give
 3. **Refer** — Friends click, sign up and unlock rewards for referrer + friend.
 4. **Repeat** — Each new subscriber becomes another referrer — growth compounds.
 
-<iframe width="100%" height="350px" src="https://www.youtube.com/embed/a6T2dgGGXuk" title="Flexi Viral Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<!-- <iframe width="100%" height="350px" src="https://www.youtube.com/embed/a6T2dgGGXuk" title="Flexi Viral Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
 
 This is the same psychology Dropbox, Uber, PayPal and Robinhood used to scale rapidly. FlexiViral packages this loop into a user-friendly app you can launch in minutes.
 
