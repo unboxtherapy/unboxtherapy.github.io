@@ -6,79 +6,64 @@ description: "Learn about Ur Lawyer — your trusted online resource for legal g
 image: '/images/about.webp'
 ---
 
-Welcome to [**Ur-Lawyer**](https://ur-lawyer.github.io/), your trusted online destination for reliable, easy-to-understand legal information. We provide helpful resources, guides, and insights to help individuals and families make informed decisions when facing legal challenges in the **United States**.
-
-Our mission is simple:  
-**To make legal information accessible, clear, and useful for everyone — no matter your background or situation.**
-
 ---
 
-## What We Do
+layout: page
+title: "About — Unbox Therepy"
+permalink: /about/
+description: "Unbox Therepy is an independent product review site that strips away the hype—honest unboxings, hands-on tests, and buying advice to help you choose with confidence."
+image: /assets/images/og-about.jpg
+----------------------------------
 
-Legal situations can feel overwhelming. Whether you're dealing with an injury, facing a family matter, or need legal protection, understanding your rights is essential. Our content is created to help everyday people better understand:
+# About Unbox Therepy
 
-- **Personal Injury & Accident Claims**
-- **Car, Truck, Motorcycle & Rideshare Accidents**
-- **Slip and Fall & Premises Liability Claims**
-- **Medical Malpractice & Wrongful Death Cases**
-- **Family & Divorce Law**
-- **Child Custody & Support Issues**
-- **Immigration and Visa Legal Guidance**
-- **Criminal Defense & Legal Representation**
-- **Employment Disputes & Workplace Rights**
-- **Tax, Probate & Tenant Rights Legal Matters**
-- **Traffic Ticket & Driving Violation Defense**
+**Unbox Therepy — Where products get naked.**
 
-We do **not** offer direct legal representation. Instead, we help you **learn your options**, understand how lawyers work, and feel confident taking the next step.
+Welcome! We’re Unbox Therepy, an independent product review and unboxing site dedicated to revealing the real performance, quality, and value of the things you buy — from gadgets and home goods to beauty, lifestyle, and everyday essentials.
 
----
+Our goal is simple: cut through marketing noise and give you straight, practical information so you can shop smarter.
 
-## Why Trust Ur Lawyer?
+## What we do
 
-✔ **Clear, Accurate Legal Information**  
-We break down complex legal terms into simple language.
+* **Honest Unboxings:** We show what truly comes in the box — packaging, accessories, setup, and first impressions.
+* **Hands-on Reviews:** Real tests, real usage, and clear pros & cons so you understand how a product performs in everyday life.
+* **Comparisons & Buying Guides:** Side-by-side comparisons and smart buying advice tailored to different budgets and use cases.
+* **Quick Picks & Roundups:** Curated lists for when you want fast recommendations without the fluff.
 
-✔ **Focused on Real-Life Scenarios**  
-Our guides and articles respond to real search questions people ask every day.
+## Our testing approach
 
-✔ **Regularly Updated Content**  
-Laws change — so we continue improving and updating our posts to stay accurate.
+We test products like real users. That means:
 
-✔ **Built for People, Not Lawyers**  
-You do *not* need legal knowledge to understand our resources.
+1. **Out-of-the-box check:** We inspect packaging, included accessories, and documentation.
+2. **Setup & usability:** How easy is the setup? Are the controls intuitive?
+3. **Performance & durability:** Real-world tests that mirror everyday use.
+4. **Value & longevity:** Does the product justify its price now and over time?
+5. **Photos & video:** Clear images (and sometimes video) so you can see details we describe.
 
----
+Where relevant, we include benchmark data, battery/runtime figures, and side-by-side comparisons to similar products.
 
-## Who Can Benefit From Our Content?
+## Editorial independence
 
-Our site is especially helpful for:
+Unbox Therepy is independent. We accept product samples and, in some cases, affiliate links to cover operating costs, but sponsorships and partnerships are always disclosed. Our reviews are written to be fair and transparent — if a product is great, we'll say so; if it misses the mark, we’ll tell you why.
 
-- Accident victims seeking **compensation**
-- Families dealing with **divorce or custody issues**
-- Individuals facing **criminal charges** or legal disputes
-- Workers experiencing **injury or employment problems**
-- Immigrants navigating **U.S. immigration law**
-- Anyone wanting **clarity before hiring a lawyer**
+If a manufacturer or advertiser wants changes to a published review, we will only act if the change is factual and verifiable. We do not let commercial relationships influence the editorial outcome.
 
-If you need to speak with an attorney, our guides will help you know **what to ask**, **what to expect**, and **how to choose the right lawyer**.
+## Who we’re for
 
----
+Whether you’re a budget shopper, a tech enthusiast, a busy parent, or someone who hates buyer’s remorse — our reviews are written in clear, unbiased language so you can make decisions quickly and confidently.
 
-## Our Goal
+## Got a product for review?
 
-To empower people just like you to:
+We welcome review requests and PR kits. Please send product inquiries to: **[unboxtherepy.review@gmail.com](mailto:unboxtherepy.review@gmail.com)** (for review considerations, include the product, model, and shipping details). For media or partnership requests, use the same email and include a short message explaining your proposal.
 
-- Understand your legal rights
-- Avoid costly mistakes
-- Get fair treatment under the law
-- Make confident, informed decisions
+## Corrections & feedback
 
----
+Found an error or want to share your experience with a product we reviewed? We appreciate corrections and user insights. Email [unboxtherepy.review@gmail.com](mailto:unboxtherepy.review@gmail.com) and we’ll investigate and update the article if needed.
 
-### Thank You for Visiting Ur Lawyer
+## Join our community
 
-We’re here to support you with knowledge — because **knowing your rights is your greatest advantage**.
+Follow us on social media for quick unboxing snaps, behind-the-scenes looks, and short-form reviews. Subscribe to our newsletter for monthly roundups and exclusive buying guides.
 
-If you have questions, suggestions, or collaboration inquiries, please reach out through our [**Contact Us**](/contact/) page.
+**Thanks for visiting Unbox Therepy — where products get naked so you can buy smarter.**
 
 ---
