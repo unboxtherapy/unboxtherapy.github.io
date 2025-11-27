@@ -1,102 +1,51 @@
 ---
 layout: page
-title: Contact Us
+title: "Contact Us"
 permalink: /contact/
-description: Contact Ur Lawyer for legal information, guidance, and lawyer research support across the United States. Get help with personal injury, accident law, divorce, immigration, family law, criminal defense and more.
+description: "Get in touch with Unbox Therepy for product review requests, feedback, collaborations, or media inquiries."
 image: '/images/contact.webp'
 ---
 
-Welcome to [**Ur-Lawyer**](https://ur-lawyer.github.io/) – your trusted online guide for understanding legal topics in the United States.  
-We do **not provide direct legal representation**, but we offer **information, research guidance, and educational content** to help you make informed decisions when seeking the right lawyer for your case.
+We’d love to hear from you! Whether you have a product you want reviewed, feedback on our content, collaboration ideas, or general questions — feel free to reach out.
 
-If you have questions, content suggestions, collaboration requests, or need help understanding a legal topic, we’d love to hear from you.
+## 📩 Email Us
 
-<div class="form-box">
-  <form class="form" action="https://formspree.io/f/mzzknqzn" method="POST">
-    <div class="form__group">
-      <label class="form__label screen-reader-text" for="form-name">Your Name</label>
-      <input class="form__input" id="form-name" type="text" name="name" placeholder="Name" required>
-    </div>
-    <div class="form__group">
-      <label class="form__label screen-reader-text" for="form-email">Your Email</label>
-      <input class="form__input" id="form-email" type="email" name="_replyto" placeholder="Email" required>
-    </div>
-    <div class="form__group">
-      <label class="form__label screen-reader-text" for="form-text">Your Message</label>
-      <textarea class="form__input" id="form-text" name="text" rows="7" placeholder="Message" required></textarea>
-    </div>
-    <div class="form__group">
-      <button class="button button--primary" type="submit">Send Message</button>
-    </div>
-  </form>
-</div>
+For all inquiries, please email:
 
----
+**[unboxtherepy.review@gmail.com](mailto:unboxtherepy.review@gmail.com)**
 
-## 📩 Get in Touch
+We usually respond within 24–48 hours.
 
-You can reach us anytime through email:
+## 💼 Review Requests & PR Kits
 
-**Email:** `do.and.donts.info@gmail.com`
+If you're a brand or PR agency looking to submit a product for review, please include:
 
-We aim to respond within **24–48 hours**.
+* Product name & model
+* Short description
+* Any relevant links
+* Shipping details
 
----
+We review products independently and always disclose sponsorships.
 
-## 🏛️ What We Can Help You With
+## 🛠 Feedback & Corrections
 
-We provide easy-to-understand guides and insights for:
+If you found an error in one of our reviews or want to share your own experience, send us a message. We value user feedback and update pages when needed.
 
-- **Personal Injury Lawyer** information  
-- **Car Accident & Truck Accident Lawyer** guidance  
-- **Slip and Fall Lawyer** research  
-- **Divorce & Family Lawyer** insights  
-- **Immigration Lawyer** step-by-step explanations  
-- **Child Custody Lawyer** resources  
-- **Criminal Defense Lawyer** basics  
-- **Employment & Labor Law Attorney** guidance  
-- **Medical Malpractice Lawyer** understanding  
-- **Tax & Probate Lawyer** assistance  
-- **Tenant & Housing Lawyer** awareness  
-- **Traffic Ticket Lawyer** help and case preparation tips  
+## 🤝 Partnerships & Advertising
 
-If you're unsure which type of lawyer your situation requires, feel free to ask.  
-We can help you **identify the right legal category** and connect you to **official directories** and verified resources.
+For sponsorship opportunities, affiliate partnerships, or long-term collaboration proposals, use the subject line:
+**“Partnership Inquiry – Unbox Therepy”**
+
+## 📝 Stay Connected
+
+Soon, you’ll be able to subscribe to our newsletter for:
+
+* New review updates
+* Buying guides
+* Product comparison alerts
+* Special recommendations
+
+Until then, keep checking back for fresh content.
 
 ---
 
-## 🧭 Before You Contact Us
-
-Please note:
-
-- We **do not offer legal representation**
-- We **do not provide professional legal advice**
-- We **do not handle confidential case submissions**
-
-We are an **informational legal resource**, not a law firm.
-
-For urgent legal issues, please contact a licensed attorney in your state.
-
----
-
-## 📢 Work With Us / Advertising
-
-Interested in:
-
-- Guest posts  
-- Legal article contributions  
-- Law firm partnerships  
-- Sponsored content  
-- Legal service listings  
-
-Email us with the subject line:  
-**“Partnership Inquiry”**
-
----
-
-## Thank You for Visiting
-
-We appreciate your trust in [**Ur-Lawyer**](https://ur-lawyer.github.io/).  
-Our mission is to make **legal information simple, accessible, and easy to understand**.
-
-If you haven’t already done so, explore our latest legal guides and resources:

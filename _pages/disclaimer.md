@@ -2,54 +2,66 @@
 layout: page
 title: "Disclaimer"
 permalink: /disclaimer/
-description: "Disclaimer for Ur-Lawyer: Informational legal content regarding personal injury lawyers, accident lawyers, divorce lawyers, immigration lawyers, family lawyers, criminal lawyers, and more in the United States."
+description: "Disclaimer for Unbox Therepy – product review transparency, accuracy, and liability information."
 ---
 
+Welcome to **[Unbox Therepy](unboxtherepy.github.io)**. The information provided on this website is for general informational and educational purposes only. By using our site, you agree to the terms outlined in this disclaimer.
 
-The information provided on [**Ur-Lawyer**](https://ur-lawyer.github.io/) is intended for **educational and informational purposes only**. This website is **not a law firm**, and we do **not provide legal advice, legal representation, or attorney referrals**.
+## 1. No Professional Advice
 
-While we publish articles and guides about various legal topics, including **personal injury lawyers, accident lawyers, divorce lawyers, immigration lawyers, family lawyers, criminal lawyers, medical malpractice lawyers, employment lawyers, child custody lawyers, tax lawyers, probate lawyers, traffic ticket lawyers, tenant lawyers, truck and car accident lawyers, and slip and fall lawyers**, all content is based on **general research and public sources**. None of the information should be interpreted as specific legal guidance for your personal situation.
+All reviews, guides, comparisons, and opinions published on Unbox Therepy are based on personal testing, research, and user experience. However, they **do not constitute professional advice**. Always verify product details with the manufacturer before purchasing.
 
----
+## 2. Accuracy of Information
 
-## No Attorney-Client Relationship
+We do our best to ensure the information provided is accurate and up to date. However, we make **no guarantees** regarding:
 
-Using this website, reading the content, or contacting us **does not create an attorney-client relationship**. If you need personalized legal assistance, you must **consult a qualified attorney** licensed in your state.
+* Completeness
+* Accuracy
+* Reliability
+* Suitability
+* Availability
 
----
+Product specifications, pricing, and availability may change over time.
 
-## Accuracy and Updates
+Unbox Therepy is not liable for any errors or outdated information.
 
-We strive to ensure that the information published is accurate and up-to-date. However, **laws change frequently**, and **legal outcomes vary based on individual circumstances**. We **do not guarantee** the completeness, accuracy, or reliability of any content on this site.
+## 3. Affiliate & External Links
 
-Ur-Lawyer **assumes no responsibility** for:
-- Errors or omissions in the website content
-- Reliance on any information provided here
-- Any consequences that result from using the website
+Some pages may contain **affiliate links**. This means we may earn a small commission if you purchase through these links — at no extra cost to you.
 
----
+We only recommend products we genuinely find useful based on real testing or strong user feedback.
 
-## External Links
+Unbox Therepy is **not responsible** for the content, claims, or practices of external websites linked from our pages.
 
-Our website may contain links to external legal resources, services, or law firms. These links are provided **for convenience and informational purposes only**. We have **no control over the content** or policies of third-party sites and **do not endorse** any specific law firm or attorney.
+## 4. Sponsored Reviews & Product Samples
 
----
+We sometimes receive products for review. If a review is sponsored or the product was provided for free, it will be clearly disclosed.
 
-## Not Professional Legal Advice
+Regardless of sponsorship, all opinions expressed are **honest, unbiased, and based on actual usage**.
 
-Nothing on this website should be considered:
-- Legal advice
-- Financial advice
-- Professional recommendations
-- A substitute for consulting a qualified lawyer
+## 5. Limitation of Liability
 
-If you require legal assistance, we strongly recommend contacting a licensed **U.S. attorney** who can evaluate your case.
+Unbox Therepy, its owners, and contributors are **not liable** for any losses, damages, or issues arising from:
 
----
+* Use of any product reviewed
+* Reliance on information provided on the site
+* Interactions with third-party sellers or websites
 
-## Contact
+All product use is at your own discretion and risk.
 
-If you have any questions about this Disclaimer, you may contact us through our **Contact Us** page:  
-[**Contact Page**](https://ur-lawyer.github.io/contact/)
+## 6. User Responsibility
+
+Before making any purchase, users are encouraged to:
+
+* Verify product specifications
+* Check updated pricing
+* Read warranty terms
+* Review user manuals and safety guidelines
+
+## 7. Contact Information
+
+For questions regarding this disclaimer, please contact us at:
+
+**[unboxtherepy.review@gmail.com](mailto:unboxtherepy.review@gmail.com)**
 
 ---
