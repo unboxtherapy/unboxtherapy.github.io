@@ -5,7 +5,7 @@ description: "FlexiViral review — learn how this viral lead-generation app use
 author: JayFindsThings
 image: '/images/featured_flexiviral-review-2025.webp'
 tags: [Software Review]
-featured: false
+featured: true
 ---
 
 FlexiViral is a referral-based lead generation app that turns every signup into a self-promoter using rewards, leaderboards and automated follow-ups. For businesses, affiliates and agencies that want fast list growth without ad spend, FlexiViral provides an easy-to-launch viral loop that can multiply leads 10×, 50× or more — when paired with an attractive reward and clear campaign plan.
