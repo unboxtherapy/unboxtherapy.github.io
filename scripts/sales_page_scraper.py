@@ -2,7 +2,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
@@ -36,7 +36,7 @@ def scrape_sales_page(url):
             'vendor_info': extract_vendor_info(soup),
             'guarantee': extract_guarantee(soup),
             'final_url': response.url,
-            'page_content': soup.get_text(separator=' ', strip=True)[:5000]  # First 5000 chars
+            'page_content': soup.get_text(separator=' ', strip=True)[:5000]
         }
         
         print(f"✅ Successfully scraped sales page")
@@ -46,17 +46,13 @@ def scrape_sales_page(url):
         
         return sales_data
         
-    except requests.exceptions.RequestException as e:
-        print(f"⚠️ Could not access sales page: {e}")
-        return None
     except Exception as e:
-        print(f"❌ Error scraping sales page: {e}")
+        print(f"⚠️  Could not access sales page: {e}")
         return None
 
 
 def extract_title(soup):
     """Extract product title"""
-    # Try multiple selectors
     title_selectors = [
         ('h1', {}),
         ('h2', {}),
@@ -82,7 +78,6 @@ def extract_description(soup):
     """Extract product description"""
     descriptions = []
     
-    # Look for description in meta tags
     meta_desc = soup.find('meta', {'name': 'description'})
     if meta_desc:
         descriptions.append(meta_desc.get('content', '').strip())
@@ -91,14 +86,12 @@ def extract_description(soup):
     if og_desc:
         descriptions.append(og_desc.get('content', '').strip())
     
-    # Look for description paragraphs
     desc_containers = soup.find_all(['p', 'div'], class_=re.compile(r'description|intro|summary'))
     for container in desc_containers[:3]:
         text = container.get_text(strip=True)
         if len(text) > 50:
             descriptions.append(text)
     
-    # Get first few paragraphs if nothing found
     if not descriptions:
         paragraphs = soup.find_all('p')
         for p in paragraphs[:5]:
@@ -106,22 +99,19 @@ def extract_description(soup):
             if len(text) > 50:
                 descriptions.append(text)
     
-    return ' '.join(descriptions[:3])  # Combine first 3 descriptions
+    return ' '.join(descriptions[:3])
 
 
 def extract_features(soup):
     """Extract product features"""
     features = []
     
-    # Look for feature lists
     feature_keywords = ['feature', 'benefit', 'include', 'what you get', 'capability']
     
     for keyword in feature_keywords:
-        # Find headers containing keywords
         headers = soup.find_all(['h2', 'h3', 'h4'], text=re.compile(keyword, re.IGNORECASE))
         
         for header in headers:
-            # Get the next list or siblings
             next_list = header.find_next(['ul', 'ol'])
             if next_list:
                 items = next_list.find_all('li')
@@ -130,7 +120,6 @@ def extract_features(soup):
                     if feature_text and len(feature_text) > 5:
                         features.append(feature_text)
     
-    # Remove duplicates while preserving order
     seen = set()
     unique_features = []
     for f in features:
@@ -138,17 +127,15 @@ def extract_features(soup):
             seen.add(f)
             unique_features.append(f)
     
-    return unique_features[:15]  # Return max 15 features
+    return unique_features[:15]
 
 
 def extract_pricing(soup):
     """Extract pricing information"""
     pricing_info = []
     
-    # Look for price patterns
     price_pattern = r'\$\s?(\d+(?:\.\d{2})?)'
     
-    # Find all text containing price
     price_containers = soup.find_all(text=re.compile(price_pattern))
     
     for container in price_containers[:10]:
@@ -160,7 +147,6 @@ def extract_pricing(soup):
                 'context': context
             })
     
-    # Look for pricing tables
     price_tables = soup.find_all(['table', 'div'], class_=re.compile(r'price|pricing|package'))
     for table in price_tables[:3]:
         text = table.get_text(strip=True)
@@ -180,7 +166,6 @@ def extract_benefits(soup):
     benefit_keywords = ['benefit', 'advantage', 'why', 'solve', 'help you']
     
     for keyword in benefit_keywords:
-        # Find sections about benefits
         sections = soup.find_all(['div', 'section'], text=re.compile(keyword, re.IGNORECASE))
         
         for section in sections[:3]:
@@ -195,25 +180,21 @@ def extract_images(soup, base_url):
     """Extract product images"""
     images = []
     
-    # Find all images
     img_tags = soup.find_all('img')
     
-    for img in img_tags[:20]:  # Limit to first 20 images
+    for img in img_tags[:20]:
         src = img.get('src') or img.get('data-src')
         if not src:
             continue
         
-        # Make absolute URL
         if not src.startswith('http'):
             src = urljoin(base_url, src)
         
-        # Filter out small icons and common non-product images
         if any(skip in src.lower() for skip in ['logo', 'icon', 'badge', 'button', 'social']):
             continue
         
         alt = img.get('alt', '')
         
-        # Prioritize images with product-related alt text
         if any(keyword in alt.lower() for keyword in ['product', 'screenshot', 'preview', 'demo']):
             images.insert(0, {
                 'url': src,
@@ -225,14 +206,13 @@ def extract_images(soup, base_url):
                 'alt': alt
             })
     
-    return images[:10]  # Return top 10 images
+    return images[:10]
 
 
 def extract_testimonials(soup):
     """Extract customer testimonials"""
     testimonials = []
     
-    # Look for testimonial sections
     testimonial_sections = soup.find_all(['div', 'section', 'blockquote'], 
                                         class_=re.compile(r'testimonial|review|feedback'))
     
@@ -254,7 +234,6 @@ def extract_bonuses(soup):
         headers = soup.find_all(['h2', 'h3', 'h4'], text=re.compile(keyword, re.IGNORECASE))
         
         for header in headers[:3]:
-            # Get next list or text
             next_element = header.find_next(['ul', 'ol', 'p', 'div'])
             if next_element:
                 text = next_element.get_text(strip=True)
@@ -268,13 +247,7 @@ def extract_vendor_info(soup):
     """Extract vendor/creator information"""
     vendor_info = {}
     
-    # Look for vendor name
-    vendor_patterns = [
-        'created by',
-        'developed by',
-        'from',
-        'by'
-    ]
+    vendor_patterns = ['created by', 'developed by', 'from', 'by']
     
     for pattern in vendor_patterns:
         elements = soup.find_all(text=re.compile(pattern, re.IGNORECASE))
@@ -306,14 +279,8 @@ def extract_guarantee(soup):
 def search_product_info(product_name, creator=""):
     """
     Search for product information online if sales page unavailable
-    Uses web search to find reviews, info
     """
     print(f"\n🔎 Searching online for: {product_name}")
-    
-    search_query = f"{creator} {product_name} review features"
-    
-    # This would integrate with a search API (Google, Bing, etc.)
-    # For now, return placeholder structure
     
     return {
         'title': product_name,

@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   schedule:
-    - cron: "0 */12 * * *"  # Every 23 hours
+    - cron: "0 */12 * * *"  # Every 12 hours
   workflow_dispatch:  # Manual trigger
 
 jobs:
@@ -23,14 +23,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install google-genai pillow requests google-auth google-api-python-client beautifulsoup4 python-slugify lxml
+          pip install google-genai pillow requests beautifulsoup4 python-slugify lxml google-auth google-api-python-client
 
       - name: Generate product reviews
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FREEPIK_API_KEY: ${{ secrets.FREEPIK_API_KEY }}
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
           WEBPUSHR_API_KEY: ${{ secrets.WEBPUSHR_API_KEY }}
           WEBPUSHR_AUTH_TOKEN: ${{ secrets.WEBPUSHR_AUTH_TOKEN }}
         run: |
@@ -41,7 +39,8 @@ jobs:
           git config user.name "review-bot"
           git config user.email "bot@github.com"
 
-          git add _posts/ images/
+          # Add generated files AND database
+          git add _posts/ images/ reviews_database.json
 
           # Get list of new reviews
           NEW_REVIEWS=$(git diff --cached --name-only | grep "_posts/" | wc -l)

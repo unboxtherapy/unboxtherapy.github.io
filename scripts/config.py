@@ -4,9 +4,7 @@ import os
 # File paths
 POSTS_DIR = "_posts"
 IMAGES_DIR = "images"
-
-# Google Sheets
-SHEETS_RANGE = "Sheet1!A:I"  # Range to check for existing reviews
+REVIEWS_DB_FILE = "reviews_database.json"
 
 # Site settings
 SITE_DOMAIN = "https://unboxtherapy.github.io"
@@ -28,27 +26,18 @@ OPTIMIZE_IMAGE = True
 WAIT_TIME_BEFORE_INDEXING = 180  # seconds (3 minutes)
 
 # MunchEye Settings
-MUNCHEYE_SECTIONS = ['just_launched', 'big_launches']  # Which sections to scrape
-REVIEW_RECENT_DAYS = 14  # Review products launched within X days
+MUNCHEYE_SECTIONS = ['just_launched', 'big_launches']
+REVIEW_RECENT_DAYS = 14
 
 # API Keys (from environment)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 FREEPIK_API_KEY = os.environ.get("FREEPIK_API_KEY")
-GOOGLE_SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
-GOOGLE_SPREADSHEET_ID = os.environ.get("GOOGLE_SPREADSHEET_ID")
 
-# Social media (optional)
-TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY")
-TWITTER_API_SECRET = os.environ.get("TWITTER_API_SECRET")
-TWITTER_ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
-TWITTER_ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
-TWITTER_BEARER_TOKEN = os.environ.get("TWITTER_BEARER_TOKEN")
 
-LINKEDIN_ACCESS_TOKEN = os.environ.get("LINKEDIN_ACCESS_TOKEN")
-LINKEDIN_PERSON_ID = os.environ.get("LINKEDIN_PERSON_ID")
-
-WEBPUSHR_API_KEY = os.environ.get("WEBPUSHR_API_KEY")
-WEBPUSHR_AUTH_TOKEN = os.environ.get("WEBPUSHR_AUTH_TOKEN")
+# Push Notifications (Optional)
+WEBPUSHR_API_KEY = os.environ.get("WEBPUSHR_API_KEY", "")
+WEBPUSHR_AUTH_TOKEN = os.environ.get("WEBPUSHR_AUTH_TOKEN", "")
+ENABLE_PUSH_NOTIFICATIONS = bool(WEBPUSHR_API_KEY and WEBPUSHR_AUTH_TOKEN)
 
 # Create directories
 os.makedirs(POSTS_DIR, exist_ok=True)

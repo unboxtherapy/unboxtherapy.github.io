@@ -8,16 +8,36 @@ from slugify import slugify
 from config import *
 from muncheye_scraper import get_products_for_review
 from sales_page_scraper import scrape_sales_page, search_product_info
-from sheets_checker import get_existing_reviews, filter_unreviewed_products, display_review_stats
+from json_tracker import (
+    get_existing_reviews, 
+    filter_unreviewed_products, 
+    display_review_stats,
+    log_published_review
+)
 from review_article_generator import (
     generate_review_article,
     create_review_front_matter,
     generate_image_prompt
 )
 from image_generator import generate_image_freepik
-from google_indexing import submit_to_google_indexing, check_indexing_status
-from google_sheets_logger import log_to_google_sheets
-from webpushr_notifier import send_blog_post_notification
+
+def send_push_notification_safe(title, permalink, focus_kw):
+    """Safely attempt push notification (optional)"""
+    if not ENABLE_PUSH_NOTIFICATIONS:
+        print("⏭️  Push notifications disabled (no credentials)")
+        return False
+    
+    try:
+        from webpushr_notifier import send_blog_post_notification
+        
+        print(f"\n{'='*60}")
+        print(f"📢 Sending Push Notification")
+        print(f"{'='*60}")
+        
+        return send_blog_post_notification(title, permalink, focus_kw)
+    except Exception as e:
+        print(f"⚠️  Push notification failed: {e}")
+        return False
 
 
 def main():
@@ -36,12 +56,14 @@ def main():
         return
     print("✅ FREEPIK_API_KEY found")
     
+    # Optional features status
+    print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
+    
     # Get products to review
     print(f"\n{'='*60}")
     print(f"Step 1: Fetching Products from MunchEye")
     print(f"{'='*60}")
     
-    # Get more products initially since we'll filter duplicates
     initial_products = get_products_for_review(limit=POSTS_PER_RUN * 3)
     
     if not initial_products:
@@ -50,7 +72,7 @@ def main():
     
     print(f"\n✅ Found {len(initial_products)} products on MunchEye")
     
-    # Step 2: Check Google Sheets for existing reviews
+    # Step 2: Check for existing reviews
     print(f"\n{'='*60}")
     print(f"Step 2: Checking for Duplicate Reviews")
     print(f"{'='*60}")
@@ -89,7 +111,7 @@ def main():
         # Generate permalink
         permalink = slugify(f"{creator}-{product_name}-review")[:100]
         
-        # Double-check if review exists locally (belt and suspenders approach)
+        # Double-check if review exists locally
         today = datetime.date.today().isoformat()
         post_path = f"{POSTS_DIR}/{today}-{permalink}.md"
         image_file = f"{IMAGES_DIR}/{permalink}.webp"
@@ -99,7 +121,7 @@ def main():
             print("⏭️  Skipping to next product...")
             continue
         
-        # Additional check: see if similar permalink exists with different date
+        # Check for similar posts with different dates
         existing_posts = [f for f in os.listdir(POSTS_DIR) if permalink in f]
         if existing_posts:
             print(f"\n⚠️  Similar review found: {existing_posts[0]}")
@@ -107,9 +129,9 @@ def main():
             continue
         
         try:
-            # Step 2: Scrape sales page
+            # Scrape sales page
             print(f"\n{'='*60}")
-            print(f"Step 2: Extracting Sales Page Information")
+            print(f"Step 3: Extracting Sales Page Information")
             print(f"{'='*60}")
             
             sales_data = scrape_sales_page(product['url'])
@@ -118,12 +140,11 @@ def main():
                 print(f"⚠️  Sales page data incomplete, searching online...")
                 sales_data = search_product_info(product_name, creator)
             
-            # Step 3: Generate review article
+            # Generate review article
             print(f"\n{'='*60}")
-            print(f"Step 3: Generating Review Article")
+            print(f"Step 4: Generating Review Article")
             print(f"{'='*60}")
             
-            # Prepare affiliate link placeholder
             affiliate_link = f"https://your-affiliate-link.com/{permalink}"
             
             article_content = generate_review_article(
@@ -134,25 +155,21 @@ def main():
             
             print(f"✅ Article generated ({len(article_content)} characters)")
             
-            # Step 4: Create front matter
+            # Create front matter
             print(f"\n{'='*60}")
-            print(f"Step 4: Creating Front Matter")
+            print(f"Step 5: Creating Front Matter")
             print(f"{'='*60}")
             
             front_matter = create_review_front_matter(product, permalink)
-            
-            # Combine front matter and content
             full_article = front_matter + "\n\n" + article_content
             
-            # Step 5: Generate featured image
+            # Generate featured image
             print(f"\n{'='*60}")
-            print(f"Step 5: Generating Featured Image")
+            print(f"Step 6: Generating Featured Image")
             print(f"{'='*60}")
             
-            # Try to use image from sales page first
             if sales_data.get('images') and len(sales_data['images']) > 0:
                 print(f"📸 Using image from sales page...")
-                # Download first image from sales page
                 try:
                     import requests
                     from PIL import Image
@@ -162,7 +179,6 @@ def main():
                     response = requests.get(img_url, timeout=30)
                     img = Image.open(BytesIO(response.content)).convert("RGB")
                     
-                    # Save and optimize
                     img.thumbnail((1920, 1080), Image.Resampling.LANCZOS)
                     img.save(image_file, "WEBP", quality=IMAGE_QUALITY, optimize=True)
                     
@@ -175,14 +191,13 @@ def main():
                     image_prompt = generate_image_prompt(f"{product_name} product review")
                     generate_image_freepik(image_prompt, image_file)
             else:
-                # Generate AI image
                 print(f"🎨 Generating AI image...")
                 image_prompt = generate_image_prompt(f"{product_name} software review screenshot")
                 generate_image_freepik(image_prompt, image_file)
             
-            # Step 6: Save post
+            # Save post
             print(f"\n{'='*60}")
-            print(f"Step 6: Saving Review Post")
+            print(f"Step 7: Saving Review Post")
             print(f"{'='*60}")
             
             with open(post_path, "w", encoding="utf-8") as f:
@@ -200,10 +215,11 @@ def main():
             
             posts_generated += 1
             
-            # Step 7: Wait before indexing (only after last post)
+            # Post-generation tasks (only after last post)
             if i == len(products):
+                # Wait for GitHub Pages deployment
                 print(f"\n{'='*60}")
-                print(f"Step 7: Waiting for GitHub Pages Deployment")
+                print(f"Step 8: Waiting for GitHub Pages Deployment")
                 print(f"{'='*60}")
                 
                 for remaining in range(WAIT_TIME_BEFORE_INDEXING, 0, -30):
@@ -214,34 +230,13 @@ def main():
                 
                 print(f"\n✅ Wait complete!")
                 
-                # Step 8: Submit to Google
+                # Log to database
                 print(f"\n{'='*60}")
-                print(f"Step 8: Submitting to Google Search Console")
-                print(f"{'='*60}")
-                
-                indexing_status = "Not Attempted"
-                try:
-                    success = submit_to_google_indexing(post_url)
-                    indexing_status = "Success" if success else "Failed"
-                    
-                    # Check status
-                    if success:
-                        time.sleep(10)
-                        status_result = check_indexing_status(post_url)
-                        if status_result and 'latestUpdate' in status_result:
-                            indexing_status = "Confirmed in Queue"
-                
-                except Exception as e:
-                    indexing_status = f"Failed - {str(e)[:100]}"
-                    print(f"⚠️  Indexing failed (non-critical): {e}")
-                
-                # Step 9: Log to Google Sheets
-                print(f"\n{'='*60}")
-                print(f"Step 9: Logging to Google Sheets")
+                print(f"Step 9: Logging to Reviews Database")
                 print(f"{'='*60}")
                 
                 try:
-                    log_to_google_sheets(
+                    log_published_review(
                         title=f"{product_name} Review",
                         focus_kw=product_name,
                         permalink=permalink,
@@ -250,15 +245,11 @@ def main():
                         indexing_status=indexing_status
                     )
                 except Exception as e:
-                    print(f"⚠️  Sheets logging failed: {e}")
+                    print(f"⚠️  Database logging failed: {e}")
                 
-                # Step 10: Send push notification
-                print(f"\n{'='*60}")
-                print(f"Step 10: Sending Push Notification")
-                print(f"{'='*60}")
-                
+                # Send push notification (optional)
                 try:
-                    send_blog_post_notification(
+                    send_push_notification_safe(
                         title=f"{product_name} Review",
                         permalink=permalink,
                         focus_kw=product_name

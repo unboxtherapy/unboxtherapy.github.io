@@ -31,7 +31,7 @@ def generate_image_freepik(prompt, output_path):
     }
     
     print(f"📤 Sending request to Freepik API...")
-    print(f"📝 Prompt: {prompt[:100]}...")
+    print(f"🖼️  Prompt: {prompt[:100]}...")
     
     try:
         # Submit generation request
@@ -113,7 +113,7 @@ def poll_for_image(task_id, headers, max_attempts=40):
 def download_and_compress_image(image_url, output_path):
     """Download image and compress it"""
     print(f"✅ Generation complete!")
-    print(f"🖼️ Image URL: {image_url[:60]}...")
+    print(f"🖼️  Image URL: {image_url[:60]}...")
     print(f"📥 Downloading image...")
     
     img_response = requests.get(image_url, timeout=60)

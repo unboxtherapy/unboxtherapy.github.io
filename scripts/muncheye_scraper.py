@@ -11,7 +11,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 def scrape_muncheye_products(sections=None, limit_per_section=5):
     """
-    Scrape products from MunchEye - IMPROVED VERSION
+    Scrape products from MunchEye
     """
     if sections is None:
         sections = ['big_launches', 'just_launched']
@@ -31,10 +31,9 @@ def scrape_muncheye_products(sections=None, limit_per_section=5):
         soup = BeautifulSoup(response.content, 'html.parser')
         products = []
         
-        # Try to find ANY product listings
         print(f"\n🔎 Searching for product listings...")
         
-        # Method 1: Look for product links
+        # Look for product links
         product_links = soup.find_all('a', href=re.compile(r'/[a-z0-9-]+/?$'))
         
         if product_links:
@@ -50,9 +49,9 @@ def scrape_muncheye_products(sections=None, limit_per_section=5):
                 except Exception as e:
                     continue
         
-        # Method 2: Look for structured product data
+        # Alternative method if first fails
         if not products:
-            print(f"⚠️ No products from links, trying alternative methods...")
+            print(f"⚠️  No products from links, trying alternative methods...")
             products = scrape_alternative_structure(soup, limit_per_section * len(sections))
         
         print(f"\n✅ Total products scraped: {len(products)}")
@@ -212,7 +211,7 @@ def get_products_for_review(limit=5, categories=None):
     print(f"{'='*60}")
     
     # Scrape products with increased limit
-    fetch_limit = limit * 5  # Get even more to ensure we have enough
+    fetch_limit = limit * 5
     
     products = scrape_muncheye_products(
         sections=['big_launches', 'just_launched', 'all_launches'],
@@ -221,10 +220,6 @@ def get_products_for_review(limit=5, categories=None):
     
     if not products:
         print("❌ No products found")
-        print("💡 This might be because:")
-        print("   - MunchEye structure has changed")
-        print("   - Network issues")
-        print("   - Bot detection")
         return []
     
     print(f"\n✅ Found {len(products)} total products")
@@ -259,4 +254,4 @@ if __name__ == "__main__":
             print(f"   Platform: {product['platform']}")
             print(f"   URL: {product['url']}")
     else:
-        print("\n❌ No products found - scraper may need updates")
+        print("\n❌ No products found")

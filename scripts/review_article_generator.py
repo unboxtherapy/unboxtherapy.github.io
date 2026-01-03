@@ -14,7 +14,7 @@ def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE
     Args:
         product_data: Dict from muncheye_scraper
         sales_data: Dict from sales_page_scraper
-        affiliate_link: Affiliate URL (placeholder if not available)
+        affiliate_link: Affiliate URL
     
     Returns:
         Complete article in Jekyll format
@@ -27,7 +27,6 @@ def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE
     platform = product_data['platform']
     launch_date = product_data['launch_date']
     
-    # Prepare sales information
     features = sales_data.get('features', [])
     description = sales_data.get('description', '')
     benefits = sales_data.get('benefits', [])
@@ -174,7 +173,6 @@ Write the complete article now:
         contents=prompt
     )
     
-    # Remove any front matter AI might add
     content = remove_front_matter(response.text)
     
     print(f"✅ Article generated ({len(content)} characters)")
@@ -188,16 +186,12 @@ def create_review_front_matter(product_data, permalink):
     product_name = product_data['name']
     creator = product_data['creator']
     
-    # Generate SEO-friendly title
     title = f"{product_name} Review {product_data['launch_date'][:4]} - Honest Analysis by Real Users"
     
-    # Generate description
     description = generate_review_description(product_name, creator, product_data['price'])
     
-    # Determine category/tag
     category = determine_category(product_name)
     
-    # Escape quotes
     escaped_title = title.replace('"', '\\"')
     escaped_desc = description.replace('"', '\\"')
     
@@ -255,7 +249,6 @@ Return ONLY the description text.
     
     description = response.text.strip()
     
-    # Ensure under 160 chars
     if len(description) > 160:
         description = description[:157] + "..."
     
