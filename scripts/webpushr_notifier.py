@@ -49,7 +49,7 @@ def send_webpushr_notification(title, message, target_url, image_url=None):
             "title": title,
             "message": message,
             "target_url": target_url,
-            "icon": f"{SITE_DOMAIN}/assets/images/site-logo.webp",  # Your site logo
+            "icon": f"{SITE_DOMAIN}/images/site-logo.webp",  # Your site logo
             "auto_hide": 1  # Auto hide after shown
         }
         
@@ -87,7 +87,7 @@ def send_blog_post_notification(title, permalink, focus_kw):
     
     # Construct full URL
     post_url = f"{SITE_DOMAIN}/{permalink}"
-    image_url = f"{SITE_DOMAIN}/assets/images/{permalink.strip('/').split('/')[-1]}.webp"
+    image_url = f"{SITE_DOMAIN}/images/{permalink.strip('/').split('/')[-1]}.webp"
     description = generate_description(title, focus_kw)
     # Create notification message
     notification_title = f"{title[:80]}"
@@ -136,7 +136,7 @@ def send_segmented_notification(title, message, target_url, segment_id=None):
             "title": title,
             "message": message,
             "target_url": target_url,
-            "icon": f"{SITE_DOMAIN}/assets/images/site-logo.webp"
+            "icon": f"{SITE_DOMAIN}/images/site-logo.webp"
         }
         
         response = requests.post(api_url, headers=headers, json=payload, timeout=30)
@@ -182,7 +182,7 @@ def send_action_button_notification(title, message, target_url, button_title="Re
             "title": title,
             "message": message,
             "target_url": target_url,
-            "icon": f"{SITE_DOMAIN}/assets/images/site-logo.webp",
+            "icon": f"{SITE_DOMAIN}/images/site-logo.webp",
             "action_buttons": [
                 {
                     "title": button_title,

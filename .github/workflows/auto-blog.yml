@@ -1,0 +1,54 @@
+name: MunchEye Review Auto Publisher
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: "0 */12 * * *"  # Every 23 hours
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  publish-reviews:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install google-genai pillow requests google-auth google-api-python-client beautifulsoup4 python-slugify lxml
+
+      - name: Generate product reviews
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FREEPIK_API_KEY: ${{ secrets.FREEPIK_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+          WEBPUSHR_API_KEY: ${{ secrets.WEBPUSHR_API_KEY }}
+          WEBPUSHR_AUTH_TOKEN: ${{ secrets.WEBPUSHR_AUTH_TOKEN }}
+        run: |
+          python scripts/generate_reviews.py
+
+      - name: Commit & Push changes
+        run: |
+          git config user.name "review-bot"
+          git config user.email "bot@github.com"
+
+          git add _posts/ images/
+
+          # Get list of new reviews
+          NEW_REVIEWS=$(git diff --cached --name-only | grep "_posts/" | wc -l)
+
+          if [ $NEW_REVIEWS -gt 0 ]; then
+            git commit -m "🎯 Added $NEW_REVIEWS new product review(s)" || exit 0
+            git push origin master
+          else
+            echo "No new reviews to commit"
+          fi
