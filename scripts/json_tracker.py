@@ -21,6 +21,11 @@ def load_reviews_database():
 def save_reviews_database(reviews):
     """Save reviews to JSON file"""
     try:
+        # Ensure parent directory exists
+        db_dir = os.path.dirname(REVIEWS_DB_FILE)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+        
         with open(REVIEWS_DB_FILE, 'w', encoding='utf-8') as f:
             json.dump(reviews, f, indent=2, ensure_ascii=False)
         return True
