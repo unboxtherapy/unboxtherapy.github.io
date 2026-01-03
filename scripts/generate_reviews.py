@@ -58,7 +58,6 @@ def main():
     print("✅ FREEPIK_API_KEY found")
     
     # Optional features status
-    print(f"📋 Google Indexing: {'✅ Enabled' if ENABLE_GOOGLE_INDEXING else '❌ Disabled'}")
     print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
     
     # Get products to review
