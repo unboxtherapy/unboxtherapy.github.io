@@ -1,20 +1,17 @@
 """Send push notifications via Webpushr (Optional)"""
 import os
 import requests
-from config import SITE_DOMAIN, TEXT_MODEL, GEMINI_API_KEY
-from google import genai
+from config import SITE_DOMAIN, GROQ_API_KEY
+from groq_client import generate_content
 
 # Webpushr API credentials
 WEBPUSHR_API_KEY = os.environ.get("WEBPUSHR_API_KEY")
 WEBPUSHR_AUTH_TOKEN = os.environ.get("WEBPUSHR_AUTH_TOKEN")
 
-# Initialize Gemini client
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-
 
 def generate_description(title, focus_kw):
     """Generate SEO-optimized meta description (150-160 characters)"""
-    if not client:
+    if not GROQ_API_KEY:
         return f"Read our honest review of {focus_kw}. Features, pricing, pros & cons analysis."
     
     prompt = f"""
@@ -35,12 +32,8 @@ Return ONLY the description text, nothing else.
 """
     
     try:
-        response = client.models.generate_content(
-            model=TEXT_MODEL,
-            contents=prompt
-        )
-        
-        description = response.text.strip()
+        description = generate_content(prompt, max_tokens=100)
+        description = description.strip()
         
         if len(description) > 160:
             description = description[:157] + "..."

@@ -3,15 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
-from google import genai
-from config import GEMINI_API_KEY, TEXT_MODEL
+from groq_client import generate_content
+from config import GROQ_API_KEY
 import json
 
 MUNCHEYE_URL = "https://muncheye.com/"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-
-# Initialize Gemini client
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 
 def scrape_muncheye_products(sections=None, limit_per_section=5):
@@ -55,20 +52,21 @@ def scrape_muncheye_products(sections=None, limit_per_section=5):
 
 
 def parse_with_gemini(html_content, sections, limit_per_section):
-    """Use Gemini AI to intelligently parse MunchEye HTML"""
+    """Use Groq AI to intelligently parse MunchEye HTML"""
     
-    if not client:
-        print("⚠️  Gemini client not available, using fallback parser")
+    if not GROQ_API_KEY:
+        print("⚠️  Groq API key not available, using fallback parser")
         return []
     
-    print(f"🤖 Using Gemini AI to parse MunchEye sections...")
+    print(f"🤖 Using Groq AI (Llama 3.1 70B) to parse MunchEye sections...")
+    print(f"⚡ Lightning fast analysis incoming...")
     
     # Truncate HTML to stay within token limits
     html_sample = html_content[:50000]  # First 50k characters
     
     section_names = []
     if 'big_launches' in sections:
-        section_names.append("All Launches")
+        section_names.append("Big Launches")
     if 'just_launched' in sections:
         section_names.append("Just Launched")
     
@@ -81,7 +79,7 @@ HTML CONTENT (truncated):
 {html_sample}
 
 INSTRUCTIONS:
-1. Find sections titled "All Launches" and/or "Just Launched"
+1. Find sections titled "Big Launches" and/or "Just Launched"
 2. Extract products ONLY from these specific sections
 3. Ignore all other sections (like "Coming Soon", "Yesterday's Launches", etc.)
 4. For each product, extract:
@@ -93,7 +91,7 @@ INSTRUCTIONS:
    - Launch date if available
    - Product URL/link
 
-5. Return ONLY products from "All Launches" and "Just Launched" sections
+5. Return ONLY products from "Big Launches" and "Just Launched" sections
 6. Maximum {limit_per_section} products per section
 
 OUTPUT FORMAT (JSON array):
@@ -106,12 +104,12 @@ OUTPUT FORMAT (JSON array):
     "platform": "JVZoo",
     "launch_date": "2026-01-05",
     "url": "https://muncheye.com/product-link",
-    "section": "All Launches"
+    "section": "Big Launches"
   }}
 ]
 
 CRITICAL RULES:
-- ONLY include products from "All Launches" or "Just Launched" sections
+- ONLY include products from "Big Launches" or "Just Launched" sections
 - DO NOT include products from other sections
 - Return valid JSON array
 - If no products found in target sections, return empty array []
@@ -121,14 +119,11 @@ Return ONLY the JSON array, no markdown formatting, no explanations.
 """
     
     try:
-        print(f"🔄 Sending HTML to Gemini for analysis...")
-        response = client.models.generate_content(
-            model=TEXT_MODEL,
-            contents=prompt
-        )
+        print(f"🔄 Sending HTML to Groq for analysis...")
+        response_text = generate_content(prompt, max_tokens=3000)
         
         # Clean response
-        response_text = response.text.strip()
+        response_text = response_text.strip()
         
         # Remove markdown code blocks if present
         response_text = re.sub(r'^```json\s*', '', response_text)
@@ -140,7 +135,7 @@ Return ONLY the JSON array, no markdown formatting, no explanations.
         products_data = json.loads(response_text)
         
         if not isinstance(products_data, list):
-            print(f"❌ Gemini returned non-list data")
+            print(f"❌ Groq returned non-list data")
             return []
         
         # Validate and enrich products
@@ -166,15 +161,15 @@ Return ONLY the JSON array, no markdown formatting, no explanations.
             validated_products.append(validated_product)
             print(f"✅ Found: {validated_product['creator']}: {validated_product['name']} (${validated_product['price']}) - Section: {validated_product['section']}")
         
-        print(f"\n✅ Gemini extracted {len(validated_products)} products from target sections")
+        print(f"\n✅ Groq extracted {len(validated_products)} products from target sections")
         return validated_products
         
     except json.JSONDecodeError as e:
-        print(f"❌ Failed to parse Gemini JSON response: {e}")
+        print(f"❌ Failed to parse Groq JSON response: {e}")
         print(f"Response text: {response_text[:500]}...")
         return []
     except Exception as e:
-        print(f"❌ Gemini parsing error: {e}")
+        print(f"❌ Groq parsing error: {e}")
         import traceback
         traceback.print_exc()
         return []
@@ -188,7 +183,7 @@ def parse_with_beautifulsoup(html_content, sections, limit_per_section):
     products = []
     
     # Look for section headers
-    section_headers = soup.find_all(['h2', 'h3', 'div'], text=re.compile(r'(All Launches|Just Launched)', re.IGNORECASE))
+    section_headers = soup.find_all(['h2', 'h3', 'div'], text=re.compile(r'(Big Launches|Just Launched)', re.IGNORECASE))
     
     print(f"📍 Found {len(section_headers)} potential section headers")
     
@@ -333,11 +328,11 @@ def extract_date(text):
 
 def get_products_for_review(limit=5, categories=None):
     """
-    Get products ready for review from All Launches and Just Launched sections
+    Get products ready for review from Big Launches and Just Launched sections
     """
     print(f"\n{'='*60}")
     print(f"🎯 Fetching products from MunchEye")
-    print(f"🎯 Target sections: All Launches, Just Launched")
+    print(f"🎯 Target sections: Big Launches, Just Launched")
     print(f"{'='*60}")
     
     # Scrape products with increased limit to account for filtering
@@ -352,7 +347,7 @@ def get_products_for_review(limit=5, categories=None):
         print("❌ No products found in target sections")
         return []
     
-    print(f"\n✅ Found {len(products)} total products from All Launches & Just Launched")
+    print(f"\n✅ Found {len(products)} total products from Big Launches & Just Launched")
     
     # Remove duplicates
     seen = set()
@@ -385,7 +380,7 @@ if __name__ == "__main__":
     
     if products:
         print(f"\n{'='*60}")
-        print(f"📊 Sample Products from All Launches & Just Launched")
+        print(f"📊 Sample Products from Big Launches & Just Launched")
         print(f"{'='*60}")
         
         for i, product in enumerate(products[:10], 1):

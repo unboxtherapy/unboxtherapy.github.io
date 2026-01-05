@@ -1,10 +1,8 @@
 """Generate comprehensive product review articles"""
-from google import genai
-from config import TEXT_MODEL, GEMINI_API_KEY
+from groq_client import generate_content
+from config import GROQ_API_KEY
 import re
 import json
-
-client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE_LINK_HERE]"):
@@ -204,12 +202,11 @@ Write the complete article now with images embedded:
 """
     
     print("🤖 Generating comprehensive review article with embedded images...")
-    response = client.models.generate_content(
-        model=TEXT_MODEL,
-        contents=prompt
-    )
+    print("⚡ Using Groq (Llama 3.1 70B) - Lightning fast inference!")
     
-    content = remove_front_matter(response.text)
+    response_text = generate_content(prompt, max_tokens=4000)
+    
+    content = remove_front_matter(response_text)
     
     print(f"✅ Article generated ({len(content)} characters)")
     
@@ -282,12 +279,8 @@ Requirements:
 Return ONLY the description text.
 """
     
-    response = client.models.generate_content(
-        model=TEXT_MODEL,
-        contents=prompt
-    )
-    
-    description = response.text.strip()
+    description = generate_content(prompt, max_tokens=100)
+    description = description.strip()
     
     if len(description) > 160:
         description = description[:157] + "..."
@@ -312,11 +305,8 @@ Return ONLY the image prompt, nothing else.
 """
     
     print("🎨 Generating image prompt...")
-    response = client.models.generate_content(
-        model=TEXT_MODEL,
-        contents=prompt
-    )
-    return response.text.strip()
+    response = generate_content(prompt, max_tokens=200)
+    return response.strip()
 
 
 def determine_category(product_name):

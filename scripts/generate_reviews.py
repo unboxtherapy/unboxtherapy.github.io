@@ -70,33 +70,38 @@ def send_push_notification_safe(title, permalink, focus_kw):
 def main():
     print("=" * 60)
     print("🚀 MunchEye Product Review Generator")
+    print("⚡ Powered by Groq (Llama 3.1 70B) - Lightning Fast!")
     print("=" * 60)
     
     # Verify environment variables
-    if not GEMINI_API_KEY:
-        print("❌ GEMINI_API_KEY not found")
+    if not GROQ_API_KEY:
+        print("❌ GROQ_API_KEY not found")
+        print("🔗 Get free API key at: https://console.groq.com/")
         return
-    print("✅ GEMINI_API_KEY found")
+    print("✅ GROQ_API_KEY found")
     
     if not FREEPIK_API_KEY:
-        print("❌ FREEPIK_API_KEY not found")
-        return
-    print("✅ FREEPIK_API_KEY found")
+        print("⚠️  FREEPIK_API_KEY not found (optional - for fallback image generation)")
+    else:
+        print("✅ FREEPIK_API_KEY found")
     
     # Optional features status
+    print(f"📋 Google Indexing: {'✅ Enabled' if ENABLE_GOOGLE_INDEXING else '❌ Disabled'}")
     print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
+    print(f"🤖 AI Model: Groq Llama 3.1 70B (Free, Fast)")
+    print(f"⚡ Speed: ~3-5 seconds per review")
     
     # Get products to review
     print(f"\n{'='*60}")
     print(f"Step 1: Fetching Products from MunchEye")
-    print(f"🎯 Targeting: All Launches & Just Launched sections ONLY")
+    print(f"🎯 Targeting: Big Launches & Just Launched sections ONLY")
     print(f"{'='*60}")
     
     # Get products from specific sections
     initial_products = get_products_for_review(limit=POSTS_PER_RUN * 3)
     
     if not initial_products:
-        print("❌ No products found in All Launches or Just Launched sections")
+        print("❌ No products found in Big Launches or Just Launched sections")
         return
     
     print(f"\n✅ Found {len(initial_products)} products from target sections")
