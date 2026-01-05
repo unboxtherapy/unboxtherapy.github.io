@@ -23,6 +23,7 @@ def generate_content(prompt, max_tokens=4000, temperature=0.7):
         raise ValueError("❌ GROQ_API_KEY not found. Get one free at https://console.groq.com/")
     
     try:
+        # Use the model from config
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -30,7 +31,7 @@ def generate_content(prompt, max_tokens=4000, temperature=0.7):
                     "content": prompt
                 }
             ],
-            model=GROQ_MODEL,
+            model=GROQ_MODEL,  # Uses llama-3.3-70b-versatile
             max_tokens=max_tokens,
             temperature=temperature,
         )
@@ -39,6 +40,19 @@ def generate_content(prompt, max_tokens=4000, temperature=0.7):
         
     except Exception as e:
         print(f"❌ Groq API error: {e}")
+        # If model fails, try with updated model name
+        if "decommissioned" in str(e).lower() or "not found" in str(e).lower():
+            print(f"⚠️  Model {GROQ_MODEL} not available, trying llama-3.3-70b-versatile...")
+            try:
+                chat_completion = client.chat.completions.create(
+                    messages=[{"role": "user", "content": prompt}],
+                    model="llama-3.3-70b-versatile",  # Fallback to latest
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                )
+                return chat_completion.choices[0].message.content
+            except Exception as e2:
+                print(f"❌ Fallback also failed: {e2}")
         raise
 
 
