@@ -60,14 +60,14 @@ def generate_content(prompt, max_tokens=4000, temperature=0.7):
         elif "413" in error_msg or "too large" in error_msg.lower() or "limit" in error_msg.lower():
             print(f"⚠️  Request too large, trying faster model with larger context...")
             try:
-                # Try llama-3.1-8b-instant (faster, handles more tokens)
+                # Try llama-3.3-70b-versatile (faster, handles more tokens)
                 chat_completion = client.chat.completions.create(
                     messages=[{"role": "user", "content": prompt}],
-                    model="llama-3.1-8b-instant",
+                    model="llama-3.3-70b-versatile",
                     max_tokens=max_tokens,
                     temperature=temperature,
                 )
-                print(f"✅ Successfully generated with llama-3.1-8b-instant")
+                print(f"✅ Successfully generated with llama-3.3-70b-versatile")
                 return chat_completion.choices[0].message.content
             except Exception as e2:
                 print(f"❌ Fallback model also failed: {e2}")
