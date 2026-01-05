@@ -58,11 +58,11 @@ def parse_with_gemini(html_content, sections, limit_per_section):
         print("⚠️  Groq API key not available, using fallback parser")
         return []
     
-    print(f"🤖 Using Groq AI (Llama 3.1 70B) to parse MunchEye sections...")
+    print(f"🤖 Using Groq AI (Llama 3.1 8B) to parse MunchEye sections...")
     print(f"⚡ Lightning fast analysis incoming...")
     
-    # Truncate HTML to stay within token limits (reduce from 50k to 20k)
-    html_sample = html_content[:20000]  # Reduced from 50000 to fit token limits
+    # Truncate HTML to stay within token limits - increased to get more products
+    html_sample = html_content[:30000]  # Increased from 20000 to capture more content
     
     section_names = []
     if 'big_launches' in sections:
@@ -73,26 +73,25 @@ def parse_with_gemini(html_content, sections, limit_per_section):
     prompt = f"""
 You are parsing the MunchEye.com website to extract product launch information.
 
-TASK: Extract products ONLY from these sections: {', '.join(section_names)}
+TASK: Extract ALL products from these sections: {', '.join(section_names)}
 
-HTML CONTENT (truncated):
+HTML CONTENT:
 {html_sample}
 
 INSTRUCTIONS:
 1. Find sections titled "Big Launches" and/or "Just Launched"
-2. Extract products ONLY from these specific sections
-3. Ignore all other sections (like "Coming Soon", "Yesterday's Launches", etc.)
-4. For each product, extract:
+2. Extract ALL products from these specific sections (not just a few)
+3. For each product, extract:
    - Product name (often in format "Creator: Product Name")
    - Creator/Vendor name
    - Price (look for $ amounts)
    - Commission percentage (look for "at XX%")
    - Platform (JVZoo, WarriorPlus, ClickBank, etc.)
-   - Launch date if available
+   - Launch date (look for dates like "4 Jan", "15 Jan")
    - Product URL/link
 
-5. Return ONLY products from "Big Launches" and "Just Launched" sections
-6. Maximum {limit_per_section} products per section
+4. Return AT LEAST 10-15 products if available
+5. Include every product you can find in the target sections
 
 OUTPUT FORMAT (JSON array):
 [
@@ -102,20 +101,20 @@ OUTPUT FORMAT (JSON array):
     "price": "47",
     "commission": "50",
     "platform": "JVZoo",
-    "launch_date": "2026-01-05",
+    "launch_date": "2026-01-15",
     "url": "https://muncheye.com/product-link",
-    "section": "Big Launches"
-  }}
+    "section": "Just Launched"
+  }},
+  ... (repeat for ALL products found)
 ]
 
 CRITICAL RULES:
-- ONLY include products from "Big Launches" or "Just Launched" sections
-- DO NOT include products from other sections
+- Extract EVERY product from "Big Launches" and "Just Launched"
+- Don't stop at 5-10 products, get them ALL
 - Return valid JSON array
-- If no products found in target sections, return empty array []
 - Extract actual URLs from the HTML
 
-Return ONLY the JSON array, no markdown formatting, no explanations.
+Return ONLY the JSON array, no markdown, no explanations.
 """
     
     try:
@@ -176,43 +175,85 @@ Return ONLY the JSON array, no markdown formatting, no explanations.
 
 
 def parse_with_beautifulsoup(html_content, sections, limit_per_section):
-    """Fallback parser using BeautifulSoup"""
+    """Fallback parser using BeautifulSoup - improved to catch more products"""
     print(f"🔄 Using BeautifulSoup fallback parser...")
     
     soup = BeautifulSoup(html_content, 'html.parser')
     products = []
     
-    # Look for section headers
-    section_headers = soup.find_all(['h2', 'h3', 'div'], text=re.compile(r'(Big Launches|Just Launched)', re.IGNORECASE))
+    # Strategy 1: Look for "Just Launched" section specifically
+    print(f"\n📍 Looking for 'Just Launched' section...")
     
-    print(f"📍 Found {len(section_headers)} potential section headers")
+    # Find the "Just Launched" heading
+    just_launched_heading = soup.find(['h2', 'h3', 'div', 'span'], 
+                                     text=re.compile(r'Just\s+Launched', re.IGNORECASE))
     
-    for header in section_headers:
-        section_name = header.get_text(strip=True)
-        print(f"\n🔍 Processing section: {section_name}")
+    if just_launched_heading:
+        print(f"✅ Found 'Just Launched' section header")
         
-        # Get products after this header
-        container = header.find_next(['div', 'ul', 'table'])
+        # Get all links after this heading until next major heading
+        current = just_launched_heading.find_next()
+        count = 0
         
-        if not container:
-            continue
+        while current and count < 50:  # Check next 50 elements
+            # Stop if we hit another major section
+            if current.name in ['h2', 'h3'] and current != just_launched_heading:
+                section_text = current.get_text(strip=True).lower()
+                if any(x in section_text for x in ['big launch', 'coming soon', 'yesterday']):
+                    print(f"📍 Stopped at next section: {section_text}")
+                    break
+            
+            # Look for product links
+            if current.name == 'a' and current.get('href'):
+                product = extract_product_from_link(current, "Just Launched")
+                if product and product not in products:
+                    products.append(product)
+            
+            # Also check children for links
+            links = current.find_all('a', href=True, recursive=False)
+            for link in links:
+                product = extract_product_from_link(link, "Just Launched")
+                if product and product not in products:
+                    products.append(product)
+            
+            current = current.find_next()
+            count += 1
+    
+    print(f"📊 Found {len(products)} products from Just Launched section")
+    
+    # Strategy 2: Also try finding Big Launches
+    print(f"\n📍 Looking for 'Big Launches' section...")
+    big_launches = soup.find(['h2', 'h3', 'div'], text=re.compile(r'Big\s+Launch', re.IGNORECASE))
+    
+    if big_launches:
+        print(f"✅ Found 'Big Launches' section")
+        current = big_launches.find_next()
+        count = 0
+        big_launch_products = []
         
-        # Find all links in this section
-        links = container.find_all('a', href=True)
-        
-        section_products = 0
-        for link in links:
-            if section_products >= limit_per_section:
+        while current and count < 30:
+            if current.name in ['h2', 'h3'] and current != big_launches:
                 break
             
-            product = extract_product_from_link(link, section_name)
-            if product and product not in products:
-                products.append(product)
-                section_products += 1
+            if current.name == 'a' and current.get('href'):
+                product = extract_product_from_link(current, "Big Launches")
+                if product and product not in products and product not in big_launch_products:
+                    big_launch_products.append(product)
+            
+            links = current.find_all('a', href=True, recursive=False)
+            for link in links:
+                product = extract_product_from_link(link, "Big Launches")
+                if product and product not in products and product not in big_launch_products:
+                    big_launch_products.append(product)
+            
+            current = current.find_next()
+            count += 1
         
-        print(f"✅ Extracted {section_products} products from {section_name}")
+        products.extend(big_launch_products)
+        print(f"📊 Found {len(big_launch_products)} products from Big Launches")
     
-    return products
+    print(f"\n✅ Total products from fallback parser: {len(products)}")
+    return products[:limit_per_section * 2]  # Return more products
 
 
 def extract_product_from_link(link_element, section_name="Unknown"):
