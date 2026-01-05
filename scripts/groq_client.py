@@ -39,20 +39,39 @@ def generate_content(prompt, max_tokens=4000, temperature=0.7):
         return chat_completion.choices[0].message.content
         
     except Exception as e:
+        error_msg = str(e)
         print(f"❌ Groq API error: {e}")
-        # If model fails, try with updated model name
-        if "decommissioned" in str(e).lower() or "not found" in str(e).lower():
+        
+        # Handle specific error cases
+        if "decommissioned" in error_msg.lower() or "not found" in error_msg.lower():
             print(f"⚠️  Model {GROQ_MODEL} not available, trying llama-3.3-70b-versatile...")
             try:
                 chat_completion = client.chat.completions.create(
                     messages=[{"role": "user", "content": prompt}],
-                    model="llama-3.3-70b-versatile",  # Fallback to latest
+                    model="llama-3.3-70b-versatile",
                     max_tokens=max_tokens,
                     temperature=temperature,
                 )
                 return chat_completion.choices[0].message.content
             except Exception as e2:
                 print(f"❌ Fallback also failed: {e2}")
+        
+        # Handle token limit exceeded (413 error)
+        elif "413" in error_msg or "too large" in error_msg.lower() or "limit" in error_msg.lower():
+            print(f"⚠️  Request too large, trying faster model with larger context...")
+            try:
+                # Try llama-3.1-8b-instant (faster, handles more tokens)
+                chat_completion = client.chat.completions.create(
+                    messages=[{"role": "user", "content": prompt}],
+                    model="llama-3.1-8b-instant",
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                )
+                print(f"✅ Successfully generated with llama-3.1-8b-instant")
+                return chat_completion.choices[0].message.content
+            except Exception as e2:
+                print(f"❌ Fallback model also failed: {e2}")
+        
         raise
 
 

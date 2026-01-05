@@ -35,7 +35,7 @@ def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE
     
     # Prepare image information for Gemini
     image_list = []
-    for idx, img in enumerate(images[:10], 1):  # Limit to 10 images
+    for idx, img in enumerate(images[:5], 1):  # Limit to TOP 5 images only (reduced from 10)
         image_list.append({
             'id': f'image_{idx}',
             'url': img['url'],
@@ -74,19 +74,22 @@ AFFILIATE LINK PLACEHOLDER: {affiliate_link}
 ARTICLE REQUIREMENTS:
 
 ## Image Usage Instructions:
-- You have {len(image_list)} images available from the product sales page
-- Use these images strategically throughout the article
-- Place images where they best illustrate the content
-- Insert images using markdown: ![alt text](image_url)
-- Use at least 3-5 images if available
+- You have {len(image_list)} HIGH-QUALITY product images available
+- IMPORTANT: Only use these images if they are clearly product screenshots or features
+- DO NOT use images that look like:
+  * Ads or promotional banners
+  * Affiliate platform logos (JVZoo, WarriorPlus, etc.)
+  * Payment buttons or badges
+  * Social media icons
+  * Generic marketing graphics
+- Use 2-3 images MAXIMUM strategically throughout the article
 - Good places for images:
-  * After the introduction (overview screenshot)
-  * In the "Key Features" section (feature screenshots)
-  * In the "How Does It Work" section (workflow/process images)
-  * In the "Pricing" section (pricing table screenshot)
-  * In the "Interface/Dashboard" section
+  * After the introduction (main product dashboard/interface)
+  * In the "Key Features" section (ONE feature screenshot)
+  * In the "How Does It Work" section (workflow image)
+- Only embed images that clearly show the product interface/features
 - Add descriptive alt text for each image
-- Center images using HTML if needed: <p align="center"><img src="url" alt="description"></p>
+- Format: ![alt text](image_url)
 
 ## Structure:
 1. **Introduction** (2-3 paragraphs)
@@ -235,14 +238,6 @@ def create_review_front_matter(product_data, permalink):
     front_matter = f"""---
 title: "{escaped_title}"
 description: "{escaped_desc}"
-author_profile: false
-read_time: true
-comments: true
-share: true
-related: true
-toc: true 
-toc_sticky: true 
-toc_icon: "list-ul"
 tags: [{category}, Software Review, {creator}]
 categories: [Product Reviews]
 featured: true

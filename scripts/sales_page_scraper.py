@@ -177,7 +177,7 @@ def extract_benefits(soup):
 
 
 def extract_images(soup, base_url):
-    """Extract product images - prioritize high-quality screenshots"""
+    """Extract product images - prioritize high-quality screenshots, filter out ads"""
     images = []
     
     img_tags = soup.find_all('img')
@@ -193,8 +193,21 @@ def extract_images(soup, base_url):
         if not src.startswith('http'):
             src = urljoin(base_url, src)
         
-        # Skip unwanted images
-        if any(skip in src.lower() for skip in ['logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar']):
+        # Skip unwanted images (EXPANDED LIST)
+        skip_keywords = [
+            'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
+            'banner', 'ad', 'advertisement', 'promo', 'sidebar',
+            'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
+            'paypal', 'stripe', 'payment',  # Payment logos
+            'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
+            'testimonial', 'review-star', 'rating',  # Review graphics
+            'countdown', 'timer', 'urgent',  # Urgency graphics
+            '728x90', '300x250', '160x600', '468x60',  # Common ad sizes
+            'affiliate', 'commission', 'earn-money',  # Affiliate images
+        ]
+        
+        src_lower = src.lower()
+        if any(skip in src_lower for skip in skip_keywords):
             continue
         
         # Skip tiny images
@@ -202,7 +215,7 @@ def extract_images(soup, base_url):
         height = img.get('height')
         if width and height:
             try:
-                if int(width) < 200 or int(height) < 200:
+                if int(width) < 300 or int(height) < 200:
                     continue
             except:
                 pass
@@ -210,33 +223,53 @@ def extract_images(soup, base_url):
         alt = img.get('alt', '').lower()
         img_class = ' '.join(img.get('class', [])).lower()
         
+        # Skip if alt or class contains ad-related terms
+        if any(skip in alt for skip in skip_keywords):
+            continue
+        if any(skip in img_class for skip in skip_keywords):
+            continue
+        
         # Calculate relevance score
         score = 0
         
         # High priority: product screenshots, features, dashboard
-        if any(keyword in alt for keyword in ['screenshot', 'dashboard', 'interface', 'demo', 'preview', 'feature']):
+        high_priority = ['screenshot', 'dashboard', 'interface', 'demo', 'preview', 'feature', 'app']
+        if any(keyword in alt for keyword in high_priority):
             score += 10
-        if any(keyword in img_class for keyword in ['screenshot', 'product', 'feature', 'demo']):
+        if any(keyword in img_class for keyword in high_priority):
             score += 8
-        
-        # Medium priority: general product images
-        if any(keyword in alt for keyword in ['product', 'software', 'app', 'tool']):
+        if any(keyword in src_lower for keyword in high_priority):
             score += 5
         
-        # Check if image is in main content area
-        parent = img.find_parent(['article', 'main', 'section'])
-        if parent:
+        # Medium priority: general product images
+        medium_priority = ['product', 'software', 'app', 'tool', 'screen']
+        if any(keyword in alt for keyword in medium_priority):
+            score += 5
+        if any(keyword in src_lower for keyword in medium_priority):
             score += 3
         
+        # Check if image is in main content area
+        parent = img.find_parent(['article', 'main', 'section', 'div'])
+        if parent and parent.get('class'):
+            parent_class = ' '.join(parent.get('class', [])).lower()
+            if 'content' in parent_class or 'main' in parent_class:
+                score += 3
+        
         # Prefer larger images
-        if 'large' in src.lower() or 'full' in src.lower():
+        if 'large' in src_lower or 'full' in src_lower:
             score += 2
         
-        scored_images.append({
-            'url': src,
-            'alt': img.get('alt', ''),
-            'score': score
-        })
+        # Prefer images with descriptive alt text
+        if alt and len(alt) > 10:
+            score += 2
+        
+        # Only add images with positive score
+        if score > 0:
+            scored_images.append({
+                'url': src,
+                'alt': img.get('alt', ''),
+                'score': score
+            })
     
     # Sort by score (highest first)
     scored_images.sort(key=lambda x: x['score'], reverse=True)
@@ -251,9 +284,9 @@ def extract_images(soup, base_url):
                 'alt': img['alt']
             })
     
-    print(f"📸 Found {len(images)} relevant images (sorted by quality)")
+    print(f"📸 Found {len(images)} relevant product images (filtered out ads/banners)")
     
-    return images[:15]  # Return top 15 images
+    return images[:10]  # Return top 10 best images only
 
 
 def extract_testimonials(soup):
