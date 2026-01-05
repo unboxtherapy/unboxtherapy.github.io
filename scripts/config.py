@@ -13,7 +13,7 @@ SITE_DOMAIN = "https://unboxtherapy.github.io"
 # AI Configuration - Using Groq (free, fast, never expires)
 AI_PROVIDER = "groq"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GROQ_MODEL = "llama-3.3-70b-versatile"  # Latest Llama 3.3 model (Dec 2024)
+GROQ_MODEL = "mixtral-8x7b-32768"  # Latest Llama 3.3 model (Dec 2024)
 
 # Image generation (optional - now using sales page images instead)
 FREEPIK_API_KEY = os.environ.get("FREEPIK_API_KEY", "")
