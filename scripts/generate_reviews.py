@@ -22,31 +22,6 @@ from review_article_generator import (
 from image_utils import try_download_featured_image, validate_image_file
 
 
-def submit_to_google_indexing_safe(post_url):
-    """Safely attempt Google Indexing (optional)"""
-    if not ENABLE_GOOGLE_INDEXING:
-        print("⏭️  Google Indexing disabled (no credentials)")
-        return "Disabled"
-    
-    try:
-        from google_indexing import submit_to_google_indexing, check_indexing_status
-        
-        print(f"\n{'='*60}")
-        print(f"📤 Submitting to Google Search Console")
-        print(f"{'='*60}")
-        
-        success = submit_to_google_indexing(post_url)
-        if success:
-            time.sleep(10)
-            status_result = check_indexing_status(post_url)
-            if status_result and 'latestUpdate' in status_result:
-                return "Confirmed in Queue"
-            return "Success"
-        return "Failed"
-    except Exception as e:
-        print(f"⚠️  Google Indexing failed: {e}")
-        return f"Failed - {str(e)[:100]}"
-
 
 def send_push_notification_safe(title, permalink, focus_kw):
     """Safely attempt push notification (optional)"""
@@ -86,7 +61,6 @@ def main():
         print("✅ FREEPIK_API_KEY found")
     
     # Optional features status
-    print(f"📋 Google Indexing: {'✅ Enabled' if ENABLE_GOOGLE_INDEXING else '❌ Disabled'}")
     print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
     print(f"🤖 AI Model: Groq Llama 3.1 70B (Free, Fast)")
     print(f"⚡ Speed: ~3-5 seconds per review")
@@ -285,16 +259,13 @@ def main():
                 print(f"Step 8: Waiting for GitHub Pages Deployment")
                 print(f"{'='*60}")
                 
-                for remaining in range(WAIT_TIME_BEFORE_INDEXING, 0, -30):
-                    minutes = remaining // 60
-                    seconds = remaining % 60
-                    print(f"⏰ Time remaining: {minutes}m {seconds}s", end='\r')
-                    time.sleep(30)
+                #     minutes = remaining // 60
+                #     seconds = remaining % 60
+                #     print(f"⏰ Time remaining: {minutes}m {seconds}s", end='\r')
+                #     time.sleep(30)
                 
-                print(f"\n✅ Wait complete!")
+                # print(f"\n✅ Wait complete!")
                 
-                # Submit to Google (optional)
-                indexing_status = submit_to_google_indexing_safe(post_url)
                 
                 # Log to database
                 print(f"\n{'='*60}")
@@ -307,8 +278,7 @@ def main():
                         focus_kw=product_name,
                         permalink=permalink,
                         image_path=image_file,
-                        article_content=article_content,
-                        indexing_status=indexing_status
+                        article_content=article_content
                     )
                     
                     if not success:
