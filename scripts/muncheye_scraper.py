@@ -62,7 +62,7 @@ def parse_with_gemini(html_content, sections, limit_per_section):
     print(f"⚡ Lightning fast analysis incoming...")
     
     # Truncate HTML to stay within token limits - increased to get more products
-    html_sample = html_content[:30000]  # Increased from 20000 to capture more content
+    html_sample = html_content[:50000]  # Increased from 20000 to capture more content
     
     section_names = []
     if 'big_launches' in sections:
