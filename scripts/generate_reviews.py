@@ -266,6 +266,28 @@ def main():
             
             post_url = f"{SITE_DOMAIN}/{permalink}"
             
+            # Log to database immediately after saving post
+            print(f"\n{'='*60}")
+            print(f"Step 7: Logging to Reviews Database")
+            print(f"{'='*60}")
+            
+            try:
+                success = log_published_review(
+                    title=f"{product_name} Review",
+                    focus_kw=product_name,
+                    permalink=permalink,
+                    image_path=image_file,
+                    article_content=article_content
+                )
+                
+                if success:
+                    print(f"✅ Added to database: {permalink}")
+                else:
+                    print(f"⚠️  Database logging had issues, but continuing...")
+                    
+            except Exception as e:
+                print(f"⚠️  Database logging failed: {e}")
+            
             print(f"\n{'='*60}")
             print(f"✅ SUCCESS! Review {i} Generated")
             print(f"{'='*60}")
@@ -278,36 +300,8 @@ def main():
             if i == len(products):
                 # Wait for GitHub Pages deployment
                 print(f"\n{'='*60}")
-                print(f"Step 8: Waiting for GitHub Pages Deployment")
+                print(f"Step 8: Post-Generation Complete")
                 print(f"{'='*60}")
-                
-                #     minutes = remaining // 60
-                #     seconds = remaining % 60
-                #     print(f"⏰ Time remaining: {minutes}m {seconds}s", end='\r')
-                #     time.sleep(30)
-                
-                # print(f"\n✅ Wait complete!")
-                
-                
-                # Log to database
-                print(f"\n{'='*60}")
-                print(f"Step 9: Logging to Reviews Database")
-                print(f"{'='*60}")
-                
-                try:
-                    success = log_published_review(
-                        title=f"{product_name} Review",
-                        focus_kw=product_name,
-                        permalink=permalink,
-                        image_path=image_file,
-                        article_content=article_content
-                    )
-                    
-                    if not success:
-                        print(f"⚠️  Database logging had issues, but continuing...")
-                        
-                except Exception as e:
-                    print(f"⚠️  Database logging failed: {e}")
                     print(f"💡 This is non-critical, continuing...")
                     import traceback
                     traceback.print_exc()
