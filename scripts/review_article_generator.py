@@ -366,3 +366,11 @@ def determine_category(product_name):
             return category.title()
     
     return 'Software Review'
+
+
+def generate_image_prompt(title):
+    """
+    DEPRECATED: No longer generates image prompts since we don't embed images
+    Kept for backward compatibility
+    """
+    return ""  # Return empty string for backward compatibility
