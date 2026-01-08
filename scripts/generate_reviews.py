@@ -196,37 +196,39 @@ def main():
             front_matter = create_review_front_matter(product, permalink)
             full_article = front_matter + "\n\n" + article_content
             
+            # In generate_reviews.py, replace the image selection section with this:
+
             # Generate featured image
             print(f"\n{'='*60}")
             print(f"Step 6: Setting Featured Image")
             print(f"{'='*60}")
-            
+
             featured_image_set = False
-            
-            # Strategy 1: Try e-cover from MunchEye (highest quality)
-            if ecover_url:
-                print(f"📸 E-cover found from MunchEye detail page")
-                print(f"🎯 Strategy 1: Using official e-cover image")
-                
-                featured_image_set = try_download_featured_image(
-                    [{'url': ecover_url, 'alt': f'{product_name} Official E-cover'}],
-                    image_file
-                )
-            
-            # Strategy 2: Try JV Page images
-            if not featured_image_set and sales_data.get('images') and len(sales_data['images']) > 0:
-                print(f"\n📸 Found {len(sales_data['images'])} images from JV Page")
-                print(f"🎯 Strategy 2: Using images from JV page")
+
+            # PRIORITY 1: Try JV Page images FIRST (best quality product screenshots)
+            if sales_data.get('images') and len(sales_data['images']) > 0:
+                print(f"📸 Found {len(sales_data['images'])} images from JV Page")
+                print(f"🎯 Strategy 1 (PRIORITY): Using best images from JV page")
                 
                 featured_image_set = try_download_featured_image(
                     sales_data['images'],
                     image_file
                 )
-            
-            # Strategy 3: If no JV images, search web
+
+            # PRIORITY 2: If JV Page has no good images, try e-cover from MunchEye
+            if not featured_image_set and ecover_url:
+                print(f"\n📸 E-cover found from MunchEye detail page")
+                print(f"🎯 Strategy 2 (FALLBACK): Using official e-cover image")
+                
+                featured_image_set = try_download_featured_image(
+                    [{'url': ecover_url, 'alt': f'{product_name} Official E-cover'}],
+                    image_file
+                )
+
+            # PRIORITY 3: Last resort - search web for product images
             if not featured_image_set:
-                print(f"\n⚠️  Could not get image from JV page")
-                print(f"🔍 Strategy 3: Searching web for product images...")
+                print(f"\n⚠️  Could not get image from JV page or e-cover")
+                print(f"🔍 Strategy 3 (LAST RESORT): Searching web for product images...")
                 print(f"📡 Sources: Bing, DuckDuckGo, Product Hunt, Reddit")
                 
                 from web_image_search import get_product_image_from_web
@@ -241,14 +243,14 @@ def main():
                         )
                 except Exception as e:
                     print(f"❌ Web image search failed: {e}")
-            
+
             # Final check
             if featured_image_set:
                 print(f"\n✅ Featured image successfully set!")
             else:
                 print(f"\n⚠️  No featured image could be set")
                 print(f"💡 Post will be published without featured image")
-            
+
             # Save post
             print(f"\n{'='*60}")
             print(f"Step 7: Saving Review Post")

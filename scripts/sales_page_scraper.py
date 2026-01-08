@@ -177,21 +177,23 @@ def extract_benefits(soup):
 
 
 def extract_images(soup, base_url):
-    """Extract product images - prioritize high-quality screenshots, filter out ads"""
+    """
+    Extract product images - prioritize actual product screenshots, filter out promotional graphics with faces
+    """
     images = []
     
-    # Check if this is a JV Page (typically contains 'jv' in the URL)
+    # Check if this is a JV Page
     is_jv_page = 'jv' in base_url.lower()
     
     if is_jv_page:
-        print("📋 Detected JV Page - using relaxed image filtering")
+        print("📋 Detected JV Page - filtering for product screenshots only")
     
     img_tags = soup.find_all('img')
     
     # Score images based on relevance
     scored_images = []
     
-    for img in img_tags[:30]:  # Check more images
+    for idx, img in enumerate(img_tags[:30]):
         src = img.get('src') or img.get('data-src') or img.get('data-lazy-src')
         if not src:
             continue
@@ -199,32 +201,26 @@ def extract_images(soup, base_url):
         if not src.startswith('http'):
             src = urljoin(base_url, src)
         
-        # Skip unwanted images (RELAXED for JV pages)
-        if is_jv_page:
-            # For JV pages, only skip truly irrelevant images
-            skip_keywords = [
-                'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
-                'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
-                'paypal', 'stripe', 'payment',  # Payment logos
-                'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
-                'countdown', 'timer',  # Urgency graphics
-                'headshot', 'photo', 'portrait', 'profile',  # Personal photos
-                'author', 'creator', 'vendor', 'marketer',  # Affiliate marketer images
-                'face', 'person', 'people',  # Photos of people
-            ]
-        else:
-            # For non-JV pages, use stricter filtering
-            skip_keywords = [
-                'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
-                'banner', 'ad', 'advertisement', 'promo', 'sidebar',
-                'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
-                'paypal', 'stripe', 'payment',  # Payment logos
-                'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
-                'testimonial', 'review-star', 'rating',  # Review graphics
-                'countdown', 'timer', 'urgent',  # Urgency graphics
-                '728x90', '300x250', '160x600', '468x60',  # Common ad sizes
-                'affiliate', 'commission', 'earn-money',  # Affiliate images
-            ]
+        # STRICT filtering - skip unwanted images
+        skip_keywords = [
+            # Personal/promotional images
+            'headshot', 'photo', 'portrait', 'profile', 'face', 'person', 'people',
+            'author', 'creator', 'vendor', 'marketer', 'model', 'human',
+            
+            # Platform/affiliate logos
+            'logo', 'icon', 'badge', 'jvzoo', 'warriorplus', 'clickbank',
+            'paypal', 'stripe', 'payment',
+            
+            # Social media
+            'facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'social',
+            
+            # Decorative/UI elements
+            'button', 'banner', 'ad', 'advertisement', 'promo',
+            'countdown', 'timer', 'urgent', 'testimonial', 'avatar', 'gravatar',
+            
+            # Ad dimensions
+            '728x90', '300x250', '160x600', '468x60', '120x600',
+        ]
         
         src_lower = src.lower()
         if any(skip in src_lower for skip in skip_keywords):
@@ -235,7 +231,7 @@ def extract_images(soup, base_url):
         height = img.get('height')
         if width and height:
             try:
-                if int(width) < 300 or int(height) < 200:
+                if int(width) < 400 or int(height) < 300:
                     continue
             except:
                 pass
@@ -243,51 +239,50 @@ def extract_images(soup, base_url):
         alt = img.get('alt', '').lower()
         img_class = ' '.join(img.get('class', [])).lower()
         
-        # Skip if alt or class contains ad-related terms (still filter these)
-        if any(skip in alt for skip in ['icon', 'logo', 'badge', 'social']):
+        # Skip if alt or class contains skip terms
+        if any(skip in alt for skip in skip_keywords):
             continue
-        if any(skip in img_class for skip in ['icon', 'logo', 'badge', 'social']):
+        if any(skip in img_class for skip in skip_keywords):
             continue
         
-        # Calculate relevance score
+        # Calculate relevance score (ONLY for product screenshots)
         score = 0
         
-        # High priority: product screenshots, features, dashboard, ecover, banner on JV pages
-        high_priority = ['screenshot', 'dashboard', 'interface', 'demo', 'preview', 'feature', 'app', 'ecover', 'product']
-        if is_jv_page:
-            high_priority.extend(['banner', 'promo', 'graphic', 'mockup', 'cover'])
+        # HIGH priority: actual product interface/screenshots
+        high_priority = [
+            'screenshot', 'dashboard', 'interface', 'demo', 'preview', 
+            'feature', 'app', 'software', 'tool', 'screen', 'panel',
+            'console', 'admin', 'backend', 'workflow', 'process'
+        ]
         
         if any(keyword in alt for keyword in high_priority):
-            score += 10
+            score += 15
         if any(keyword in img_class for keyword in high_priority):
-            score += 8
+            score += 12
         if any(keyword in src_lower for keyword in high_priority):
-            score += 5
+            score += 8
         
-        # Medium priority: general product images
-        medium_priority = ['software', 'tool', 'screen', 'image']
-        if any(keyword in alt for keyword in medium_priority):
-            score += 5
-        if any(keyword in src_lower for keyword in medium_priority):
-            score += 3
+        # MEDIUM priority: e-covers and product graphics (for JV pages)
+        if is_jv_page:
+            medium_priority = ['ecover', 'product', 'cover', 'mockup', 'box']
+            if any(keyword in alt for keyword in medium_priority):
+                score += 10
+            if any(keyword in src_lower for keyword in medium_priority):
+                score += 6
         
-        # Check if image is in main content area
+        # BONUS: In main content area
         parent = img.find_parent(['article', 'main', 'section', 'div'])
         if parent and parent.get('class'):
             parent_class = ' '.join(parent.get('class', [])).lower()
             if 'content' in parent_class or 'main' in parent_class:
-                score += 3
+                score += 4
         
-        # Prefer larger images
+        # BONUS: Larger images
         if 'large' in src_lower or 'full' in src_lower:
-            score += 2
+            score += 3
         
-        # Prefer images with descriptive alt text
-        if alt and len(alt) > 10:
-            score += 2
-        
-        # For JV pages, give bonus to larger file names (often high-quality graphics)
-        if is_jv_page and any(ext in src_lower for ext in ['.png', '.jpg', '.jpeg']):
+        # BONUS: Descriptive alt text (but not too descriptive = promotional)
+        if alt and 10 < len(alt) < 50:
             score += 2
         
         # Only add images with positive score
@@ -301,7 +296,7 @@ def extract_images(soup, base_url):
     # Sort by score (highest first)
     scored_images.sort(key=lambda x: x['score'], reverse=True)
     
-    # Remove duplicates while preserving order
+    # Remove duplicates
     seen_urls = set()
     for img in scored_images:
         if img['url'] not in seen_urls:
@@ -311,10 +306,17 @@ def extract_images(soup, base_url):
                 'alt': img['alt']
             })
     
-    print(f"📸 Found {len(images)} relevant product images (filtered out ads/banners)")
+    print(f"📸 Found {len(images)} product screenshot images (filtered out promotional images)")
     
-    return images[:10]  # Return top 10 best images only
-
+    # Log top 3 for debugging
+    if images:
+        print(f"\n🎯 Top 3 best images:")
+        for i, img in enumerate(images[:3], 1):
+            print(f"   {i}. {img['url'][:80]}...")
+            if img['alt']:
+                print(f"      Alt: {img['alt'][:60]}")
+    
+    return images[:10]  # Return top 10 best product screenshots
 
 def extract_testimonials(soup):
     """Extract customer testimonials"""

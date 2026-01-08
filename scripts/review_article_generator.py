@@ -5,14 +5,14 @@ import re
 import json
 
 
-def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE_LINK_HERE]"):
+def generate_review_article(product_data, sales_data, affiliate_link=""):
     """
     Generate comprehensive product review article with embedded images
     
     Args:
         product_data: Dict from muncheye_scraper
         sales_data: Dict from sales_page_scraper
-        affiliate_link: Affiliate URL
+        affiliate_link: Affiliate URL (empty by default)
     
     Returns:
         Complete article in Jekyll format
@@ -33,9 +33,9 @@ def generate_review_article(product_data, sales_data, affiliate_link="[AFFILIATE
     guarantee = sales_data.get('guarantee', '')
     images = sales_data.get('images', [])
     
-    # Prepare image information for Gemini
+    # Prepare image information for AI (only product screenshots)
     image_list = []
-    for idx, img in enumerate(images[:5], 1):  # Limit to TOP 5 images only (reduced from 10)
+    for idx, img in enumerate(images[:5], 1):  # Limit to TOP 5 images only
         image_list.append({
             'id': f'image_{idx}',
             'url': img['url'],
@@ -66,66 +66,61 @@ BONUSES:
 GUARANTEE:
 {guarantee}
 
-AVAILABLE IMAGES FROM SALES PAGE:
+AVAILABLE IMAGES FROM JV PAGE:
 {json.dumps(image_list, indent=2)}
 
-AFFILIATE LINK PLACEHOLDER: {affiliate_link}
+CRITICAL IMAGE RULES:
+✗ DO NOT use emoji images (🔥, 💡, ⚡, 🎯, etc.)
+✗ DO NOT add any decorative icons or symbols as images
+✗ ONLY use actual product screenshots/interface images from the list above
+✗ NO affiliate marketer photos, NO personal photos, NO model photos
+✓ Only embed images that show: product dashboard, features, workflows, pricing tables
+✓ Use 2-3 images MAXIMUM throughout the article
+✓ Only use images if they clearly show the product interface/features
+✓ Skip images that show people's faces or promotional models
 
-ARTICLE REQUIREMENTS:
+IMAGE PLACEMENT GUIDELINES:
+- After "What is {product_name}?" section (product overview/dashboard)
+- In "Key Features" section (ONE feature screenshot only)
+- In "How Does It Work?" section (workflow/process image)
+- DO NOT add images just for decoration
 
-## Image Usage Instructions:
-- You have {len(image_list)} HIGH-QUALITY product images available
-- IMPORTANT: Only use these images if they are clearly product screenshots or features
-- DO NOT use images that look like:
-  * Ads or promotional banners
-  * Affiliate platform logos (JVZoo, WarriorPlus, etc.)
-  * Payment buttons or badges
-  * Social media icons
-  * Generic marketing graphics
-- Use 2-3 images MAXIMUM strategically throughout the article
-- Good places for images:
-  * After the introduction (main product dashboard/interface)
-  * In the "Key Features" section (ONE feature screenshot)
-  * In the "How Does It Work" section (workflow image)
-- Only embed images that clearly show the product interface/features
-- Add descriptive alt text for each image
-- Format: ![alt text](image_url)
+ARTICLE STRUCTURE:
 
-## Structure:
 1. **Introduction** (2-3 paragraphs)
    - Hook with the problem this product solves
    - Brief overview of what the product is
    - Who it's for
-   - [INSERT RELEVANT IMAGE HERE - product overview/hero image]
+   - NO IMAGES in introduction
 
 2. **What is {product_name}?** (H2)
    - Detailed explanation
    - Main purpose and functionality
    - Target audience
-   - [INSERT DASHBOARD/INTERFACE IMAGE IF AVAILABLE]
+   - [ADD ONE PRODUCT INTERFACE IMAGE HERE IF AVAILABLE]
 
 3. **Key Features** (H2)
    - List 5-10 main features with explanations
    - Use H3 subheadings for each major feature
-   - [INSERT FEATURE SCREENSHOTS BETWEEN FEATURES]
+   - [ADD ONE FEATURE SCREENSHOT IF AVAILABLE]
    - Include practical use cases
 
 4. **How Does It Work?** (H2)
    - Step-by-step process
    - User experience overview
-   - [INSERT WORKFLOW/PROCESS IMAGES]
+   - [ADD ONE WORKFLOW IMAGE IF AVAILABLE]
 
 5. **Benefits of Using {product_name}** (H2)
    - Concrete benefits
    - Real-world applications
    - Time/money savings
+   - NO IMAGES in this section
 
 6. **Pricing & Packages** (H2)
    - Price breakdown (${price})
    - Value analysis
-   - [INSERT PRICING TABLE IMAGE IF AVAILABLE]
    - Money-back guarantee details
-   - Include affiliate link with call-to-action
+   - NO affiliate links or buttons
 
 7. **Pros and Cons** (H2)
    - Honest pros (5-7 points)
@@ -139,9 +134,8 @@ ARTICLE REQUIREMENTS:
 
 9. **Bonuses & Special Offers** (H2)
    - List bonus items
-   - [INSERT BONUS IMAGES IF AVAILABLE]
    - Limited-time offers
-   - Exclusive deals
+   - NO affiliate promotions
 
 10. **{product_name} vs Competitors** (H2)
     - Comparison with 2-3 similar products
@@ -156,9 +150,9 @@ ARTICLE REQUIREMENTS:
     - Overall assessment
     - Rating (X/10)
     - Final recommendation
-    - Call-to-action with affiliate link
+    - NO call-to-action or affiliate links
 
-## WRITING STYLE:
+WRITING STYLE:
 - Write for a 10-year-old's reading level
 - Use "you" to address readers
 - Max 3 sentences per paragraph
@@ -169,43 +163,46 @@ ARTICLE REQUIREMENTS:
 - Include comparison tables
 - Add "Quick Summary" boxes
 
-## SEO OPTIMIZATION:
+SEO OPTIMIZATION:
 - Naturally include product name throughout
 - Use semantic keywords: software review, {creator} product, {platform} launch, digital marketing tools
 - Include LSI keywords: features, benefits, pricing, honest review, worth it
 - Meta-friendly structure
 
-## SPECIAL ELEMENTS:
+SPECIAL ELEMENTS:
 - Add a "Quick Verdict" box at the top after intro
 - Include pricing calculator if relevant
-- Add affiliate link in 3-4 strategic places with clear disclosure
 - Use comparison tables
 - Add "Key Takeaways" box before conclusion
 
-
-## IMPORTANT:
+CRITICAL REQUIREMENTS:
 - Article must be AT LEAST 2500 words (MINIMUM - aim for 3000+ words)
 - Write in Jekyll format (NO front matter, that's added separately)
 - Use H2, H3, H4 headings (NO H1)
 - Be balanced - include genuine cons
 - Include affiliate disclosure: "This review contains affiliate links, meaning we may earn a commission if you make a purchase through our links at no extra cost to you."
-- DO NOT include any affiliate links or buttons in the article content
-- Focus on informative, educational content about the product
+- DO NOT include any affiliate links, buttons, or CTAs in the content
+- Focus on informative, educational content only
 - Add comparison tables in markdown format
 - Include FAQ schema-friendly format
-- ONLY EMBED PRODUCT-RELATED IMAGES - NO affiliate marketer photos, NO personal photos of creators
-- Images must show: product interface, features, screenshots, dashboards, or promotional graphics ONLY
-- Skip any images that show people's faces, unless it's a screenshot of the product interface
+- MAXIMUM 3 images total in the entire article
+- ONLY product interface/screenshot images - NO decorative images
+- NO emoji images or icon graphics
 
-Write the complete article now with images embedded:
+Write the complete article now with ONLY relevant product images embedded (maximum 3):
 """
     
-    print("🤖 Generating comprehensive review article with embedded images...")
-    print("⚡ Using Groq (Llama 3.1 70B) - Lightning fast inference!")
+    print("🤖 Generating comprehensive review article...")
+    print("⚡ Using Groq (Llama 3.3 70B) - Lightning fast inference!")
     
     response_text = generate_content(prompt, max_tokens=4000)
     
     content = remove_front_matter(response_text)
+    
+    # Remove any emoji or decorative images that AI might have added
+    # Pattern: ![emoji or single char](url)
+    content = re.sub(r'!\[[\U0001F300-\U0001F9FF].*?\]\(.*?\)', '', content)  # Remove emoji images
+    content = re.sub(r'!\[[🔥💡⚡🎯✨🚀💪👍✅❌⚠️📊📈📉💰🎁]\]\(.*?\)', '', content)  # Common emojis
     
     print(f"✅ Article generated ({len(content)} characters)")
     
@@ -214,7 +211,6 @@ Write the complete article now with images embedded:
     print(f"📸 Embedded {image_count} images in the article")
     
     return content
-
 
 def create_review_front_matter(product_data, permalink):
     """Create Jekyll front matter for review article"""
