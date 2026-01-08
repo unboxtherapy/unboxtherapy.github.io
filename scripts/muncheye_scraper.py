@@ -469,19 +469,22 @@ def filter_upcoming_launches(products, min_days_ahead=3):
     return filtered
 
 
-def get_products_for_review(limit=5, categories=None):
+def get_products_for_review(limit=1, categories=None):
     """
     Get upcoming product launches from Big Launches and All Launches sections
     Only includes products launching 3+ days from now
+    OPTIMIZED: Stops as soon as first valid product is found to save tokens
     """
     print(f"\n{'='*60}")
     print(f"🎯 Fetching UPCOMING launches from MunchEye")
     print(f"🎯 Target sections: Big Launches, All Launches")
     print(f"🎯 Filter: Launching 3+ days from now")
+    print(f"🚀 Early exit: Will stop at first valid product to save tokens")
     print(f"{'='*60}")
     
-    # Scrape products with increased limit to account for filtering
-    fetch_limit = limit * 3  # Increased since we'll filter by date
+    # Fetch a reasonable batch to find at least one valid product
+    # We'll stop as soon as we find one
+    fetch_limit = 10  # Small batch to minimize tokens
     
     products = scrape_muncheye_products(
         sections=['big_launches', 'all_launches'],
@@ -494,36 +497,52 @@ def get_products_for_review(limit=5, categories=None):
     
     print(f"\n✅ Found {len(products)} total products from Big Launches & All Launches")
     
-    # Remove duplicates
-    seen = set()
-    unique_products = []
-    for p in products:
-        product_key = f"{p['creator'].lower()}-{p['name'].lower()}"
-        if product_key not in seen:
-            seen.add(product_key)
-            unique_products.append(p)
-    
-    print(f"✅ {len(unique_products)} unique products after deduplication")
-    
-    # Filter by launch date (3+ days from now)
-    from config import MIN_DAYS_AHEAD
-    filtered_products = filter_upcoming_launches(unique_products, MIN_DAYS_AHEAD)
-    
-    if not filtered_products:
-        print(f"\n⚠️  No products found launching {MIN_DAYS_AHEAD}+ days from now")
+    if not products:
+        print("❌ No products found in target sections")
         return []
     
-    # Show breakdown by section
-    section_counts = {}
-    for p in filtered_products:
-        section = p.get('section', 'Unknown')
-        section_counts[section] = section_counts.get(section, 0) + 1
+    # Process products one at a time to find first valid one
+    from datetime import datetime, timedelta
+    from config import MIN_DAYS_AHEAD
     
-    print(f"\n📊 Products by section:")
-    for section, count in section_counts.items():
-        print(f"   - {section}: {count} products")
+    today = datetime.now().date()
+    min_launch_date = today + timedelta(days=MIN_DAYS_AHEAD)
     
-    return filtered_products
+    print(f"\n📅 Looking for first valid product:")
+    print(f"   Today: {today.strftime('%Y-%m-%d')}")
+    print(f"   Minimum launch date: {min_launch_date.strftime('%Y-%m-%d')} ({MIN_DAYS_AHEAD}+ days)")
+    
+    seen = set()
+    
+    for product in products:
+        # Check for duplicates
+        product_key = f"{product['creator'].lower()}-{product['name'].lower()}"
+        if product_key in seen:
+            print(f"   ⏭️  {product['name'][:40]}... duplicate, skipping")
+            continue
+        seen.add(product_key)
+        
+        # Check launch date
+        launch_date_str = product.get('launch_date')
+        if not launch_date_str:
+            print(f"   ⚠️  {product['name'][:40]}... no launch date, skipping")
+            continue
+        
+        try:
+            launch_date = datetime.strptime(launch_date_str, '%Y-%m-%d').date()
+            days_until = (launch_date - today).days
+            
+            if launch_date >= min_launch_date:
+                print(f"   ✅ {product['name'][:40]}... launches in {days_until} days - SELECTED!")
+                print(f"\n🎉 Found valid product! Stopping search to save tokens.")
+                return [product]  # Return immediately with first valid product
+            else:
+                print(f"   ⏭️  {product['name'][:40]}... too soon ({days_until} days)")
+        except Exception as e:
+            print(f"   ⚠️  {product['name'][:40]}... date error: {e}")
+    
+    print(f"\n⚠️  No products found launching {MIN_DAYS_AHEAD}+ days from now")
+    return []
 
 
 if __name__ == "__main__":
