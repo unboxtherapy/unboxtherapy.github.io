@@ -182,14 +182,6 @@ ARTICLE REQUIREMENTS:
 - Use comparison tables
 - Add "Key Takeaways" box before conclusion
 
-## AFFILIATE LINK USAGE:
-Place affiliate links in these sections:
-1. After introduction with "Check Latest Price" button
-2. In pricing section
-3. Before pros/cons
-4. In final verdict
-
-Format: <a href="{affiliate_link}" target="_blank" rel="nofollow">Get {product_name} Now</a>
 
 ## IMPORTANT:
 - Article must be AT LEAST 2500 words (MINIMUM - aim for 3000+ words)
@@ -197,6 +189,8 @@ Format: <a href="{affiliate_link}" target="_blank" rel="nofollow">Get {product_n
 - Use H2, H3, H4 headings (NO H1)
 - Be balanced - include genuine cons
 - Include affiliate disclosure: "This review contains affiliate links, meaning we may earn a commission if you make a purchase through our links at no extra cost to you."
+- DO NOT include any affiliate links or buttons in the article content
+- Focus on informative, educational content about the product
 - Add comparison tables in markdown format
 - Include FAQ schema-friendly format
 - ONLY EMBED PRODUCT-RELATED IMAGES - NO affiliate marketer photos, NO personal photos of creators

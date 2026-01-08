@@ -142,19 +142,20 @@ HTML CONTENT:
 {html_sample}
 
 INSTRUCTIONS:
-1. Find sections titled "Big Launches" and/or "All Launches"
-2. Extract ALL products from these specific sections (not just a few)
+1. Find sections titled "Big Launches" and/or "All Launches" ONLY
+2. Extract products from these sections that are launching in the FUTURE (3+ days from now)
 3. For each product, extract:
    - Product name (often in format "Creator: Product Name")
    - Creator/Vendor name
    - Price (look for $ amounts)
    - Commission percentage (look for "at XX%")
    - Platform (JVZoo, WarriorPlus, ClickBank, etc.)
-   - Launch date (look for dates like "4 Jan", "15 Jan")
+   - Launch date (dates like "12 Jan", "20 Jan" - must be FUTURE dates, at least 3 days away)
    - Product URL/link
 
-4. Return AT LEAST 10-15 products if available
-5. Include every product you can find in the target sections
+4. Return 3-4 upcoming products maximum (launching 3+ days from now)
+5. Skip products launching today or within the next 2 days
+6. Focus on "Big Launches" section first
 
 OUTPUT FORMAT (JSON array):
 [
@@ -166,16 +167,17 @@ OUTPUT FORMAT (JSON array):
     "platform": "JVZoo",
     "launch_date": "2026-01-15",
     "url": "https://muncheye.com/product-link",
-    "section": "All Launches"
-  }},
-  ... (repeat for ALL products found)
+    "section": "Big Launches"
+  }}
 ]
 
 CRITICAL RULES:
-- Extract EVERY product from "Big Launches" and "All Launches"
-- Don't stop at 5-10 products, get them ALL
+- Extract ONLY from "Big Launches" and "All Launches" sections
+- Products MUST be launching at least 3 days from today (not already launched, not launching soon)
+- Return 3-4 products maximum
 - Return valid JSON array
 - Extract actual URLs from the HTML
+- Ensure launch dates are in YYYY-MM-DD format
 
 Return ONLY the JSON array, no markdown, no explanations.
 """
