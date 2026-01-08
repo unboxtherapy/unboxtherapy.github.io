@@ -238,107 +238,69 @@ Return ONLY the JSON array, no markdown, no explanations.
 
 
 def parse_with_beautifulsoup(html_content, sections, limit_per_section):
-    """Fallback parser using BeautifulSoup - improved to catch more products"""
+    """Fallback parser using BeautifulSoup - targets correct MunchEye columns"""
     print(f"🔄 Using BeautifulSoup fallback parser...")
     
     soup = BeautifulSoup(html_content, 'html.parser')
     products = []
     
-    # Strategy 1: Look for "Big Launches" section
-    print(f"\n📍 Looking for 'Big Launches' section...")
-    big_launches_heading = soup.find(['h2', 'h3', 'div', 'span'], 
-                                     text=re.compile(r'Big\s+Launch', re.IGNORECASE))
-    
-    if big_launches_heading:
-        print(f"✅ Found 'Big Launches' section header")
+    # Strategy 1: Look for Big Launches in #left-column
+    if 'big_launches' in sections:
+        print(f"\n📍 Looking for 'Big Launches' in #left-column...")
+        left_column = soup.find('div', id='left-column')
         
-        # Get all links after this heading until next major heading
-        current = big_launches_heading.find_next()
-        count = 0
-        
-        while current and count < 50:  # Check next 50 elements
-            # Stop if we hit another major section
-            if current.name in ['h2', 'h3'] and current != big_launches_heading:
-                section_text = current.get_text(strip=True).lower()
-                if any(x in section_text for x in ['all launch', 'just launched', 'coming soon']):
-                    print(f"📍 Stopped at next section: {section_text}")
-                    break
+        if left_column:
+            print(f"✅ Found Big Launches column")
+            items = left_column.find_all('div', class_='item')
+            print(f"📊 Found {len(items)} items in Big Launches")
             
-            # Look for product links
-            if current.name == 'a' and current.get('href'):
-                product = extract_product_from_link(current, "Big Launches")
-                if product and product not in products:
+            for item in items[:limit_per_section]:
+                product = extract_product_from_item(item, "Big Launches")
+                if product:
                     products.append(product)
+        else:
+            print(f"⚠️  #left-column not found")
+    
+    # Strategy 2: Look for All Launches in #right-column  
+    if 'all_launches' in sections:
+        print(f"\n📍 Looking for 'All Launches' in #right-column...")
+        right_column = soup.find('div', id='right-column')
+        
+        if right_column:
+            print(f"✅ Found All Launches column")
+            items = right_column.find_all('div', class_='item')
+            print(f"📊 Found {len(items)} items in All Launches")
             
-            # Also check children for links
-            links = current.find_all('a', href=True, recursive=False)
-            for link in links:
-                product = extract_product_from_link(link, "Big Launches")
-                if product and product not in products:
+            for item in items[:limit_per_section]:
+                product = extract_product_from_item(item, "All Launches")
+                if product:
                     products.append(product)
-            
-            current = current.find_next()
-            count += 1
-    
-    print(f"📊 Found {len(products)} products from Big Launches section")
-    
-    # Strategy 2: Also try finding All Launches
-    print(f"\n📍 Looking for 'All Launches' section...")
-    all_launches = soup.find(['h2', 'h3', 'div', 'button'], text=re.compile(r'All\s+Launch', re.IGNORECASE))
-    
-    if all_launches:
-        print(f"✅ Found 'All Launches' section")
-        current = all_launches.find_next()
-        count = 0
-        all_launch_products = []
-        
-        while current and count < 50:
-            if current.name in ['h2', 'h3'] and current != all_launches:
-                break
-            
-            if current.name == 'a' and current.get('href'):
-                product = extract_product_from_link(current, "All Launches")
-                if product and product not in products and product not in all_launch_products:
-                    all_launch_products.append(product)
-            
-            links = current.find_all('a', href=True, recursive=False)
-            for link in links:
-                product = extract_product_from_link(link, "All Launches")
-                if product and product not in products and product not in all_launch_products:
-                    all_launch_products.append(product)
-            
-            current = current.find_next()
-            count += 1
-        
-        products.extend(all_launch_products)
-        print(f"📊 Found {len(all_launch_products)} products from All Launches")
+        else:
+            print(f"⚠️  #right-column not found")
     
     print(f"\n✅ Total products from fallback parser: {len(products)}")
-    return products[:limit_per_section * 2]  # Return more products
+    return products
 
 
-def extract_product_from_link(link_element, section_name="Unknown"):
-    """Extract product info from a link element"""
+def extract_product_from_item(item, section_name):
+    """Extract product info from a MunchEye item div"""
     
-    href = link_element.get('href', '')
-    if not href or href in ['/', '#', 'http://muncheye.com', 'https://muncheye.com']:
+    # Get product link and name from item_info
+    item_info = item.find('div', class_='item_info')
+    if not item_info:
         return None
     
-    # Get full URL
-    if not href.startswith('http'):
-        href = MUNCHEYE_URL.rstrip('/') + '/' + href.lstrip('/')
+    link = item_info.find('a', rel='bookmark')
+    if not link or not link.get('href'):
+        return None
     
-    # Get product name from link text
-    product_text = link_element.get_text(strip=True)
+    product_url = link['href']
+    product_text = link.get_text(strip=True)
     
     if not product_text or len(product_text) < 5:
         return None
     
-    # Skip navigation links
-    if any(skip in product_text.lower() for skip in ['home', 'contact', 'about', 'login', 'register']):
-        return None
-    
-    # Parse creator and product name
+    # Parse creator and product name from "Creator: Product Name" format
     creator = ""
     product_name = product_text
     
@@ -347,28 +309,47 @@ def extract_product_from_link(link_element, section_name="Unknown"):
         creator = parts[0].strip()
         product_name = parts[1].strip() if len(parts) > 1 else product_text
     
-    # Try to find parent container for more info
-    parent = link_element.find_parent(['div', 'li', 'tr', 'td'])
-    parent_text = parent.get_text() if parent else ""
+    # Extract launch date from meta tag (most reliable)
+    launch_date = None
+    meta_date = item.find('meta', itemprop='releaseDate')
+    if meta_date and meta_date.get('content'):
+        launch_date = meta_date['content']  # Already in YYYY-MM-DD format
     
-    # Extract date
-    launch_date = extract_date(parent_text) if parent_text else datetime.now().strftime('%Y-%m-%d')
+    # Fallback: extract from date div
+    if not launch_date:
+        date_div = item.find('div', class_='date')
+        if date_div:
+            day_span = date_div.find('span', class_='day')
+            month_span = date_div.find('span', class_='month')
+            if day_span and month_span:
+                day = day_span.get_text(strip=True)
+                month = month_span.get_text(strip=True)
+                launch_date = parse_date_from_day_month(day, month)
     
-    # Extract price
-    price_match = re.search(r'\$\s?(\d+(?:\.\d+)?)', parent_text)
+    if not launch_date:
+        launch_date = datetime.now().strftime('%Y-%m-%d')
+    
+    # Extract price and commission from text
+    item_text = item.get_text()
+    price_match = re.search(r'\$\s?(\d+(?:\.\d+)?)', item_text)
     price = price_match.group(1) if price_match else "Unknown"
     
-    # Extract commission
-    commission_match = re.search(r'at\s+(\d+)%', parent_text)
+    commission_match = re.search(r'at\s+(\d+)%', item_text)
     commission = commission_match.group(1) if commission_match else "50"
     
     # Extract platform
-    platform = extract_platform_from_text(parent_text) if parent_text else "Unknown"
+    platform = "Unknown"
+    if 'WarriorPlus' in item_text or 'W+' in item_text:
+        platform = 'WarriorPlus'
+    elif 'JVZoo' in item_text or 'JVZ' in item_text:
+        platform = 'JVZoo'
+    elif 'ClickBank' in item_text:
+        platform = 'ClickBank'
     
     product_data = {
         'name': product_name,
         'creator': creator if creator else "Unknown Creator",
-        'url': href,
+        'url': product_url,
         'launch_date': launch_date,
         'price': price,
         'commission': commission,
@@ -379,6 +360,27 @@ def extract_product_from_link(link_element, section_name="Unknown"):
     }
     
     return product_data
+
+
+def parse_date_from_day_month(day, month):
+    """Parse date from day and month strings"""
+    try:
+        months = {
+            'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+            'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+        }
+        
+        month_num = months.get(month, datetime.now().month)
+        day_num = int(day)
+        year = datetime.now().year
+        
+        date = datetime(year, month_num, day_num)
+        if date.date() < datetime.now().date():
+            date = datetime(year + 1, month_num, day_num)
+        
+        return date.strftime('%Y-%m-%d')
+    except:
+        return datetime.now().strftime('%Y-%m-%d')
 
 
 def extract_platform_from_text(text):
