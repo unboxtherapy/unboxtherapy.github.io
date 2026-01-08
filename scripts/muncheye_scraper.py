@@ -297,6 +297,11 @@ def extract_product_from_item(item, section_name):
         return None
     
     product_url = link['href']
+    
+    # Ensure full URL
+    if not product_url.startswith('http'):
+        product_url = 'https://muncheye.com' + (product_url if product_url.startswith('/') else '/' + product_url)
+    
     product_text = link.get_text(strip=True)
     
     if not product_text or len(product_text) < 5:
