@@ -123,8 +123,9 @@ def parse_with_gemini(html_content, sections, limit_per_section):
     print(f"🤖 Using Groq AI (Llama 3.1 8B) to parse MunchEye sections...")
     print(f"⚡ Lightning fast analysis incoming...")
     
-    # Truncate HTML to stay within token limits - increased to get more products
-    html_sample = html_content[:50000]  # Increased from 20000 to capture more content
+    # Truncate HTML to stay within token limits (Groq: 12k TPM on free tier)
+    # ~4 chars per token, so 25k chars ≈ 6.25k tokens (safe margin)
+    html_sample = html_content[:25000]
     
     section_names = []
     if 'big_launches' in sections:
