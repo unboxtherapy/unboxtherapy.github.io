@@ -71,8 +71,8 @@ def main():
     print(f"🎯 Targeting: Big Launches & All Launches sections ONLY")
     print(f"{'='*60}")
     
-    # Get products from specific sections
-    initial_products = get_products_for_review(limit=POSTS_PER_RUN * 3)
+    # Get products from specific sections (only 1 product with early exit optimization)
+    initial_products = get_products_for_review(limit=1)
     
     if not initial_products:
         print("❌ No products found in Big Launches or All Launches sections")

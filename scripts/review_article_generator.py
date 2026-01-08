@@ -192,14 +192,16 @@ Place affiliate links in these sections:
 Format: <a href="{affiliate_link}" target="_blank" rel="nofollow">Get {product_name} Now</a>
 
 ## IMPORTANT:
-- Article must be 2500+ words
+- Article must be AT LEAST 2500 words (MINIMUM - aim for 3000+ words)
 - Write in Jekyll format (NO front matter, that's added separately)
 - Use H2, H3, H4 headings (NO H1)
 - Be balanced - include genuine cons
 - Include affiliate disclosure: "This review contains affiliate links, meaning we may earn a commission if you make a purchase through our links at no extra cost to you."
 - Add comparison tables in markdown format
 - Include FAQ schema-friendly format
-- STRATEGICALLY EMBED THE AVAILABLE IMAGES THROUGHOUT THE ARTICLE
+- ONLY EMBED PRODUCT-RELATED IMAGES - NO affiliate marketer photos, NO personal photos of creators
+- Images must show: product interface, features, screenshots, dashboards, or promotional graphics ONLY
+- Skip any images that show people's faces, unless it's a screenshot of the product interface
 
 Write the complete article now with images embedded:
 """

@@ -208,6 +208,9 @@ def extract_images(soup, base_url):
                 'paypal', 'stripe', 'payment',  # Payment logos
                 'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
                 'countdown', 'timer',  # Urgency graphics
+                'headshot', 'photo', 'portrait', 'profile',  # Personal photos
+                'author', 'creator', 'vendor', 'marketer',  # Affiliate marketer images
+                'face', 'person', 'people',  # Photos of people
             ]
         else:
             # For non-JV pages, use stricter filtering
