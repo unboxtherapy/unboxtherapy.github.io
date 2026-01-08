@@ -31,9 +31,6 @@ Imagine a simple system that brings all these important parts of your online bus
 
 Created by the experienced marketer Mark Thompson, PayKickstart 2.0 is designed for online entrepreneurs, digital marketers, course creators, and anyone who wants to sell products and manage affiliates more smoothly. It’s built to make your life easier and your business more organized.
 
-<p align="center">
-  <img src="https://muncheye.com/wp-content/themes/muncheye/images/defaultPaidHeader.png" alt="Generic header image representing online business solutions" width="600">
-</p>
 
 ### Quick Verdict: PayKickstart 2.0 (Main Launch)
 
@@ -67,19 +64,12 @@ If you sell memberships, courses with monthly access, or software that charges a
 
 You can easily see who is subscribed, when their next payment is due, and manage upgrades or downgrades. This helps reduce "churn," which is when customers cancel their subscriptions. It also provides tools for communicating with subscribers about their payments.
 
-<p align="center">
-  <img src="https://muncheye.com/wp-content/themes/muncheye/images/subscribe.png" alt="Subscribe button icon, representing subscription management features" width="200">
-</p>
 
 ### Powerful Affiliate Management System
 
 One of PayKickstart's strongest points is its affiliate management. This feature lets you build and run your own network of promoters. Affiliates can sign up, get unique links, and promote your products to their audience. When they make a sale, PayKickstart tracks it and automatically calculates their commission.
 
 You can set different commission rates, manage payouts, and provide your affiliates with marketing materials. This system helps you expand your reach without spending a fortune on advertising. It makes growing your sales through partnerships very simple.
-
-<p align="center">
-  <img src="https://muncheye.com/wp-content/themes/muncheye/images/affiliates/4168.png" alt="Generic affiliate program icon, symbolizing affiliate management tools" width="400">
-</p>
 
 ### Intuitive Sales Funnel Builder
 
@@ -253,9 +243,6 @@ Mark Thompson is a well-known entrepreneur and software developer in the digital
 
 The official launch date for PayKickstart 2.0 (Main Launch) is January 20, 2026. This means it will be available for purchase and use starting from that date.
 
-<p align="center">
-  <img src="https://muncheye.com/wp-content/themes/muncheye/images/CAL-googleCal.jpg" alt="Google Calendar icon, representing event scheduling and planning" width="200">
-</p>
 
 ### Q5: Can I sell physical products with PayKickstart 2.0?
 

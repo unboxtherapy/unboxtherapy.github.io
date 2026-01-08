@@ -307,7 +307,7 @@ product_name: "{product_name}"
 creator: "{creator}"
 price: "${product_data['price']}"
 launch_date: "{product_data['launch_date']}"
-affiliate_disclosure: true
+affiliate_disclosure: false
 ---"""
     
     return front_matter

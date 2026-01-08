@@ -41,7 +41,6 @@ Soduku Maker is a brand-new desktop application designed by IM Wealth Builders e
 
 The main purpose of Soduku Maker is to make the process of creating puzzle books super easy. It aims to save you tons of time and effort compared to making puzzles by hand or using complicated software. The target audience for Soduku Maker includes aspiring KDP publishers, online entrepreneurs, stay-at-home parents, or anyone who wants to earn passive income by selling puzzle books. You don't need to be a puzzle expert or a graphic designer to use it.
 
-<p align="center"><img src="https://muncheye.com/wp-content/uploads/2025/12/sudoku-header-2.png" alt="Soduku Maker software dashboard preview"></p>
 
 ## Key Features
 

@@ -44,7 +44,13 @@ Cohortia has a range of features that make it an attractive solution for buildin
 
 Here is a comparison table that highlights the key features of Cohortia:
 
-| Feature | Description | Benefit | |----------|-------------|----------| | AI-powered virtual members | Behave like real humans, interacting with other members | Increases engagement and retention | | Auto-engagement | Automatically likes and reacts to posts | Increases engagement and retention | | Auto-posting | Automatically creates relevant, fresh content | Reduces need for manual posting | | Auto-comments | Automatically comments and replies to content | Creates a sense of community and engagement | | Auto-growth | Uses AI-driven engagement to grow your community | Attracts and retains members |
+| Feature | Description | Benefit | 
+|----------|-------------|----------| 
+| AI-powered virtual members | Behave like real humans, interacting with other members | Increases engagement and retention | 
+| Auto-engagement | Automatically likes and reacts to posts | Increases engagement and retention | 
+| Auto-posting | Automatically creates relevant, fresh content | Reduces need for manual posting | 
+| Auto-comments | Automatically comments and replies to content | Creates a sense of community and engagement | 
+| Auto-growth | Uses AI-driven engagement to grow your community | Attracts and retains members |
 
 In my testing, I've found that these features work seamlessly together to create a vibrant and engaging community. The AI-powered virtual members are particularly impressive, as they can help to spark discussions and increase engagement.
 
