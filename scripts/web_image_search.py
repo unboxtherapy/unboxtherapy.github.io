@@ -1,4 +1,4 @@
-"""Reliable web image search using multiple sources"""
+"""Reliable web image search with STRICT product-only filtering"""
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -8,60 +8,93 @@ import json
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 
-def search_duckduckgo_images(query, limit=10):
+def is_product_image(url, alt_text="", context=""):
     """
-    Search DuckDuckGo for images (most reliable, doesn't block)
+    STRICT validation: Is this actually a product screenshot/interface?
+    Returns True ONLY for genuine product images
     """
-    print(f"🦆 Searching DuckDuckGo Images...")
+    url_lower = url.lower()
+    alt_lower = alt_text.lower()
+    context_lower = context.lower()
     
-    try:
-        # DuckDuckGo doesn't require API key
-        url = "https://duckduckgo.com/"
+    combined = f"{url_lower} {alt_lower} {context_lower}"
+    
+    # IMMEDIATE REJECTION - These are NEVER product images
+    strict_blocklist = [
+        # People/faces
+        'face', 'person', 'people', 'human', 'man', 'woman', 'guy', 'girl',
+        'headshot', 'portrait', 'photo', 'selfie', 'profile', 'avatar',
+        'author', 'creator', 'vendor', 'marketer', 'founder', 'ceo',
         
-        session = requests.Session()
-        session.headers.update({'User-Agent': USER_AGENT})
+        # Logos and badges
+        'logo', 'icon', 'badge', 'seal', 'emblem', 'stamp',
+        'jvzoo', 'warriorplus', 'clickbank', 'paykickstart',
+        'paypal', 'stripe', 'visa', 'mastercard',
         
-        # Get initial page to get vqd token
-        response = session.get(url, timeout=10)
+        # Social media
+        'facebook', 'twitter', 'instagram', 'linkedin', 'youtube',
+        'social', 'share', 'follow',
         
-        # Now search for images
-        search_url = f"https://duckduckgo.com/?q={quote_plus(query)}&iax=images&ia=images"
+        # Promotional graphics
+        'banner', 'ad', 'advertisement', 'promo', 'sale', 'discount',
+        'urgent', 'limited', 'bonus', 'free', 'countdown', 'timer',
+        'testimonial', 'review-star', 'rating',
         
-        response = session.get(search_url, timeout=10)
+        # Generic stock images
+        'stock', 'shutterstock', 'getty', 'istock', 'pixabay', 'unsplash',
+        'placeholder', 'dummy', 'sample', 'example',
         
-        # Try to extract image URLs from the page
-        # DuckDuckGo loads images via JavaScript, but we can try to find some in HTML
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # UI elements (not product screenshots)
+        'button', 'arrow', 'checkmark', 'bullet', 'divider',
         
-        images = []
+        # Common ad sizes (these are banner ads, not products)
+        '728x90', '300x250', '160x600', '468x60', '120x600', '970x90',
+    ]
+    
+    for blocked in strict_blocklist:
+        if blocked in combined:
+            return False
+    
+    # POSITIVE SIGNALS - Must have at least ONE of these
+    product_indicators = [
+        # Actual product interface
+        'screenshot', 'interface', 'dashboard', 'panel', 'screen',
+        'console', 'admin', 'backend', 'frontend', 'ui', 'ux',
         
-        # Look for image elements
-        img_tags = soup.find_all('img', src=True)
+        # Software specific
+        'software', 'app', 'tool', 'platform', 'system',
+        'workflow', 'process', 'feature', 'demo', 'preview',
         
-        for img in img_tags:
-            src = img.get('src')
-            if src and src.startswith('http') and 'logo' not in src.lower():
-                images.append({
-                    'url': src,
-                    'alt': img.get('alt', query),
-                    'source': 'duckduckgo'
-                })
-                print(f"📸 Found: {src[:80]}...")
-                
-                if len(images) >= limit:
-                    break
-        
-        return images
-        
-    except Exception as e:
-        print(f"❌ DuckDuckGo search failed: {e}")
-        return []
+        # Product packaging (for SaaS)
+        'mockup', 'box', 'package', 'ecover', 'cover',
+    ]
+    
+    has_positive_signal = any(indicator in combined for indicator in product_indicators)
+    
+    if not has_positive_signal:
+        # No positive signals = not a product image
+        return False
+    
+    # Check file name patterns (sometimes product screenshots have descriptive names)
+    filename = url_lower.split('/')[-1].split('?')[0]
+    
+    # Good signs in filename
+    good_filename_patterns = [
+        'screenshot', 'dashboard', 'interface', 'demo', 'preview',
+        'feature', 'product', 'software', 'app'
+    ]
+    
+    # If filename contains product terms, that's a good sign
+    if any(pattern in filename for pattern in good_filename_patterns):
+        return True
+    
+    # Final check: If we got here, we have positive signals but no blocklist matches
+    # This is probably a product image
+    return True
 
 
 def search_bing_images(query, limit=10):
-    """
-    Search Bing Images (more scraper-friendly than Google)
-    """
+    """Search Bing Images with STRICT product filtering"""
     print(f"🔍 Searching Bing Images...")
     
     try:
@@ -81,24 +114,26 @@ def search_bing_images(query, limit=10):
         # Bing stores image data in special attributes
         image_elements = soup.find_all('a', class_=re.compile('iusc'))
         
-        for element in image_elements[:limit * 2]:
+        for element in image_elements[:limit * 3]:  # Get more to filter
             m = element.get('m')
             if m:
                 try:
-                    # Parse JSON data
                     data = json.loads(m)
                     image_url = data.get('murl') or data.get('turl')
+                    alt_text = data.get('t', '')
                     
-                    if image_url:
+                    if image_url and is_product_image(image_url, alt_text):
                         images.append({
                             'url': image_url,
-                            'alt': data.get('t', query),
+                            'alt': alt_text or query,
                             'source': 'bing'
                         })
-                        print(f"📸 Found: {image_url[:80]}...")
+                        print(f"📸 Valid: {image_url[:80]}...")
                         
                         if len(images) >= limit:
                             break
+                    else:
+                        print(f"❌ Rejected: {image_url[:60]}... (not product image)")
                 except:
                     continue
         
@@ -109,14 +144,62 @@ def search_bing_images(query, limit=10):
         return []
 
 
-def search_product_hunt(product_name, limit=5):
-    """
-    Search Product Hunt for product images
-    """
-    print(f"🚀 Searching Product Hunt...")
+def search_duckduckgo_images(query, limit=10):
+    """Search DuckDuckGo for images with STRICT filtering"""
+    print(f"🦆 Searching DuckDuckGo Images...")
     
     try:
-        # Product Hunt search
+        url = "https://duckduckgo.com/"
+        
+        session = requests.Session()
+        session.headers.update({'User-Agent': USER_AGENT})
+        
+        response = session.get(url, timeout=10)
+        
+        search_url = f"https://duckduckgo.com/?q={quote_plus(query)}&iax=images&ia=images"
+        response = session.get(search_url, timeout=10)
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        images = []
+        
+        img_tags = soup.find_all('img', src=True)
+        
+        for img in img_tags:
+            src = img.get('src')
+            alt = img.get('alt', '')
+            
+            if src and src.startswith('http') and is_product_image(src, alt):
+                images.append({
+                    'url': src,
+                    'alt': alt or query,
+                    'source': 'duckduckgo'
+                })
+                print(f"📸 Valid: {src[:80]}...")
+                
+                if len(images) >= limit:
+                    break
+        
+        return images
+        
+    except Exception as e:
+        print(f"❌ DuckDuckGo search failed: {e}")
+        return []
+
+
+def search_product_hunt(product_name, limit=5):
+    """Search Product Hunt ONLY if product name suggests it might be listed there"""
+    print(f"🚀 Searching Product Hunt...")
+    
+    # Only search Product Hunt for products that look like real SaaS tools
+    product_lower = product_name.lower()
+    
+    # Skip if it looks like a spammy product
+    spam_indicators = ['ai suite', 'bundle', 'mega', 'ultra', 'pro max', 'ultimate']
+    if any(spam in product_lower for spam in spam_indicators):
+        print(f"⚠️  Product name suggests low-quality tool, skipping Product Hunt")
+        return []
+    
+    try:
         search_query = quote_plus(product_name)
         url = f"https://www.producthunt.com/search?q={search_query}"
         
@@ -126,18 +209,19 @@ def search_product_hunt(product_name, limit=5):
         soup = BeautifulSoup(response.text, 'html.parser')
         images = []
         
-        # Find product images
         img_tags = soup.find_all('img', src=True)
         
         for img in img_tags:
             src = img.get('src')
-            if src and 'producthunt' in src and any(x in src for x in ['screenshot', 'product', 'image']):
+            alt = img.get('alt', '')
+            
+            if src and 'producthunt' in src and is_product_image(src, alt, 'product hunt'):
                 images.append({
                     'url': src,
                     'alt': product_name,
                     'source': 'producthunt'
                 })
-                print(f"📸 Found: {src[:80]}...")
+                print(f"📸 Valid: {src[:80]}...")
                 
                 if len(images) >= limit:
                     break
@@ -149,111 +233,73 @@ def search_product_hunt(product_name, limit=5):
         return []
 
 
-def search_imgur_reddit(product_name, limit=5):
+def search_product_images_web(product_name, creator="", limit=10):
     """
-    Search for product images on Imgur (often linked from Reddit)
-    """
-    print(f"📷 Searching Imgur/Reddit...")
-    
-    try:
-        # Search Reddit for the product
-        search_query = quote_plus(f"{product_name} review screenshot")
-        url = f"https://www.reddit.com/search.json?q={search_query}&limit=10"
-        
-        headers = {'User-Agent': USER_AGENT}
-        response = requests.get(url, headers=headers, timeout=15)
-        
-        if response.status_code == 200:
-            data = response.json()
-            images = []
-            
-            # Extract image URLs from Reddit posts
-            for post in data.get('data', {}).get('children', []):
-                post_data = post.get('data', {})
-                
-                # Check for image URL
-                url = post_data.get('url', '')
-                if any(ext in url.lower() for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']):
-                    images.append({
-                        'url': url,
-                        'alt': post_data.get('title', product_name),
-                        'source': 'reddit'
-                    })
-                    print(f"📸 Found: {url[:80]}...")
-                    
-                    if len(images) >= limit:
-                        break
-            
-            return images
-        
-        return []
-        
-    except Exception as e:
-        print(f"❌ Reddit search failed: {e}")
-        return []
-
-
-def search_product_images_web(product_name, creator="", limit=15):
-    """
-    Search for product images using multiple sources
-    
-    Args:
-        product_name: Product name
-        creator: Creator/vendor name
-        limit: Maximum images to return
-    
-    Returns:
-        List of image dicts
+    Search for ONLY genuine product screenshots/interfaces
+    Much stricter filtering - will return empty if no valid images found
     """
     print(f"\n{'='*60}")
-    print(f"🌐 Searching Web for Product Images")
+    print(f"🌐 Searching Web for PRODUCT SCREENSHOTS ONLY")
     print(f"🎯 Product: {product_name}")
     if creator:
         print(f"👤 Creator: {creator}")
+    print(f"⚠️  STRICT MODE: Only genuine product images will be returned")
     print(f"{'='*60}")
     
     all_images = []
     
-    # Build search query
+    # Build focused search query for product screenshots
     search_terms = [product_name]
-    if creator and creator != "Unknown Creator":
+    if creator and creator not in ["Unknown Creator", ""]:
         search_terms.append(creator)
-    search_terms.extend(["software", "screenshot"])
+    
+    # Add terms to specifically find product screenshots
+    search_terms.extend(["software screenshot", "dashboard"])
     
     query = " ".join(search_terms)
     
-    # Try multiple sources
-    sources = [
-        (search_bing_images, "Bing"),
-        (search_duckduckgo_images, "DuckDuckGo"),
-        (search_product_hunt, "Product Hunt"),
-        (search_imgur_reddit, "Reddit/Imgur")
-    ]
+    # Try Bing first (best for product searches)
+    print(f"\n{'─'*60}")
+    print(f"📡 Source: Bing Images")
+    print(f"{'─'*60}")
     
-    for search_func, source_name in sources:
+    try:
+        images = search_bing_images(query, limit=limit)
+        if images:
+            all_images.extend(images)
+            print(f"✅ Bing: Found {len(images)} valid product images")
+        else:
+            print(f"⚠️  Bing: No valid product images found")
+    except Exception as e:
+        print(f"❌ Bing error: {e}")
+    
+    # If we still don't have enough, try DuckDuckGo
+    if len(all_images) < 3:
+        print(f"\n{'─'*60}")
+        print(f"📡 Source: DuckDuckGo")
+        print(f"{'─'*60}")
+        
         try:
-            print(f"\n{'─'*60}")
-            print(f"📡 Source: {source_name}")
-            print(f"{'─'*60}")
-            
-            if search_func == search_product_hunt or search_func == search_imgur_reddit:
-                images = search_func(product_name, limit=5)
-            else:
-                images = search_func(query, limit=10)
-            
+            images = search_duckduckgo_images(query, limit=5)
             if images:
                 all_images.extend(images)
-                print(f"✅ {source_name}: Found {len(images)} images")
-            else:
-                print(f"⚠️  {source_name}: No images found")
-            
-            # Stop if we have enough
-            if len(all_images) >= limit:
-                break
-                
+                print(f"✅ DuckDuckGo: Found {len(images)} valid product images")
         except Exception as e:
-            print(f"❌ {source_name} error: {e}")
-            continue
+            print(f"❌ DuckDuckGo error: {e}")
+    
+    # Try Product Hunt only if we still have nothing
+    if len(all_images) == 0:
+        print(f"\n{'─'*60}")
+        print(f"📡 Source: Product Hunt (last resort)")
+        print(f"{'─'*60}")
+        
+        try:
+            images = search_product_hunt(product_name, limit=3)
+            if images:
+                all_images.extend(images)
+                print(f"✅ Product Hunt: Found {len(images)} valid product images")
+        except Exception as e:
+            print(f"❌ Product Hunt error: {e}")
     
     # Remove duplicates
     seen_urls = set()
@@ -268,17 +314,19 @@ def search_product_images_web(product_name, creator="", limit=15):
     print(f"\n{'='*60}")
     print(f"📊 Search Complete")
     print(f"{'='*60}")
-    print(f"✅ Total unique images found: {len(result)}")
     
     if result:
-        print(f"\n📸 Image sources breakdown:")
-        source_counts = {}
-        for img in result:
-            source = img.get('source', 'unknown')
-            source_counts[source] = source_counts.get(source, 0) + 1
-        
-        for source, count in source_counts.items():
-            print(f"   - {source}: {count} images")
+        print(f"✅ Found {len(result)} valid product screenshots")
+        print(f"\n📸 Selected images:")
+        for i, img in enumerate(result[:3], 1):
+            print(f"   {i}. {img['url'][:70]}...")
+            print(f"      Source: {img['source']}")
+    else:
+        print(f"⚠️  NO valid product images found")
+        print(f"💡 This means:")
+        print(f"   - No product screenshots available online")
+        print(f"   - Product may be too new or obscure")
+        print(f"   - Post will be published WITHOUT featured image")
     
     return result
 
@@ -286,21 +334,17 @@ def search_product_images_web(product_name, creator="", limit=15):
 def get_product_image_from_web(product_name, creator=""):
     """
     Get best featured image for product from the web
-    
-    Args:
-        product_name: Product name
-        creator: Creator/vendor name
-    
-    Returns:
-        dict with image url and alt text, or None
+    Returns None if no valid product image is found (STRICT)
     """
-    images = search_product_images_web(product_name, creator, limit=15)
+    images = search_product_images_web(product_name, creator, limit=10)
     
     if not images:
+        print(f"\n⚠️  NO valid product images found for {product_name}")
+        print(f"💡 Recommendation: Publish post without featured image")
         return None
     
     # Return the first (best) image
-    print(f"\n✅ Best image selected:")
+    print(f"\n✅ Best product image selected:")
     print(f"   URL: {images[0]['url'][:80]}...")
     print(f"   Alt: {images[0]['alt']}")
     print(f"   Source: {images[0]['source']}")
@@ -308,44 +352,32 @@ def get_product_image_from_web(product_name, creator=""):
     return images[0]
 
 
-def search_and_get_product_images(product_name, creator="", limit=15):
-    """
-    Search for product images and return list for article embedding
-    
-    Args:
-        product_name: Product name
-        creator: Creator name
-        limit: Maximum images to return
-    
-    Returns:
-        List of image dicts
-    """
-    images = search_product_images_web(product_name, creator, limit)
-    
-    if images:
-        print(f"\n✅ Images ready for article embedding")
-        print(f"📝 Gemini will place these strategically in the review")
-    
-    return images
-
-
 if __name__ == "__main__":
-    # Test the search
-    print("Testing Web Image Search...")
+    # Test with a real product
+    print("Testing STRICT Web Image Search...")
     
-    test_product = "Canva"
-    test_creator = ""
+    # Test 1: Real product that should have images
+    test_product = "Notion"
+    print(f"\n{'='*60}")
+    print(f"Test 1: {test_product} (should find valid images)")
+    print(f"{'='*60}")
     
-    images = search_product_images_web(test_product, test_creator, limit=10)
+    images = search_product_images_web(test_product, limit=5)
     
     if images:
-        print(f"\n{'='*60}")
-        print(f"✅ Test Results: Found {len(images)} images")
-        print(f"{'='*60}")
-        
-        for i, img in enumerate(images[:5], 1):
-            print(f"\n{i}. {img['alt'][:60]}")
-            print(f"   URL: {img['url'][:80]}...")
-            print(f"   Source: {img['source']}")
+        print(f"\n✅ SUCCESS: Found {len(images)} valid images")
     else:
-        print("\n❌ No images found in test")
+        print(f"\n⚠️  No valid images found")
+    
+    # Test 2: Obscure/fake product that shouldn't have images
+    test_product_2 = "SuperAI Mega Ultra Suite Pro Max 9000"
+    print(f"\n{'='*60}")
+    print(f"Test 2: {test_product_2} (should find NO images)")
+    print(f"{'='*60}")
+    
+    images_2 = search_product_images_web(test_product_2, limit=5)
+    
+    if images_2:
+        print(f"\n⚠️  WARNING: Found {len(images_2)} images (should be 0)")
+    else:
+        print(f"\n✅ SUCCESS: Correctly found NO valid images")
