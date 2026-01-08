@@ -75,7 +75,7 @@ def main():
     initial_products = get_products_for_review(limit=POSTS_PER_RUN * 3)
     
     if not initial_products:
-        print("❌ No products found in Big Launches or Just Launched sections")
+        print("❌ No products found in Big Launches or All Launches sections")
         return
     
     print(f"\n✅ Found {len(initial_products)} products from target sections")
