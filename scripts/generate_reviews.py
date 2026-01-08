@@ -68,7 +68,7 @@ def main():
     # Get products to review
     print(f"\n{'='*60}")
     print(f"Step 1: Fetching Products from MunchEye")
-    print(f"🎯 Targeting: Big Launches & Just Launched sections ONLY")
+    print(f"🎯 Targeting: Big Launches & All Launches sections ONLY")
     print(f"{'='*60}")
     
     # Get products from specific sections

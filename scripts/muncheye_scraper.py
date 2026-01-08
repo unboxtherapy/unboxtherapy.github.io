@@ -131,7 +131,7 @@ def parse_with_gemini(html_content, sections, limit_per_section):
     if 'big_launches' in sections:
         section_names.append("Big Launches")
     if 'just_launched' in sections:
-        section_names.append("Just Launched")
+        section_names.append("All Launches")
     
     prompt = f"""
 You are parsing the MunchEye.com website to extract product launch information.
@@ -142,7 +142,7 @@ HTML CONTENT:
 {html_sample}
 
 INSTRUCTIONS:
-1. Find sections titled "Big Launches" and/or "Just Launched"
+1. Find sections titled "Big Launches" and/or "All Launches"
 2. Extract ALL products from these specific sections (not just a few)
 3. For each product, extract:
    - Product name (often in format "Creator: Product Name")
@@ -166,13 +166,13 @@ OUTPUT FORMAT (JSON array):
     "platform": "JVZoo",
     "launch_date": "2026-01-15",
     "url": "https://muncheye.com/product-link",
-    "section": "Just Launched"
+    "section": "All Launches"
   }},
   ... (repeat for ALL products found)
 ]
 
 CRITICAL RULES:
-- Extract EVERY product from "Big Launches" and "Just Launched"
+- Extract EVERY product from "Big Launches" and "All Launches"
 - Don't stop at 5-10 products, get them ALL
 - Return valid JSON array
 - Extract actual URLs from the HTML
