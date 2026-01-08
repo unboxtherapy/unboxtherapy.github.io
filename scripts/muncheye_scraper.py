@@ -521,22 +521,28 @@ def filter_upcoming_launches(products, min_days_ahead=3):
     print(f"\n📊 {len(filtered)}/{len(products)} products launching {min_days_ahead}+ days from now")
     return filtered
 
-
-def get_products_for_review(limit=1, categories=None):
+def get_products_for_review(limit=1, categories=None, existing_reviews=None):
     """
     Get upcoming product launches from Big Launches and All Launches sections
-    Only includes products launching 3+ days from now
-    OPTIMIZED: Stops as soon as first valid product is found to save tokens
+    Only includes products launching 3+ days from now that haven't been reviewed yet
+    OPTIMIZED: Checks database during scraping to avoid wasting tokens
+    
+    Args:
+        limit: Maximum products to return
+        categories: Product categories (not used currently)
+        existing_reviews: Set of existing review identifiers from database
+    
+    Returns:
+        List of new, unreviewable products
     """
     print(f"\n{'='*60}")
     print(f"🎯 Fetching UPCOMING launches from MunchEye")
     print(f"🎯 Target sections: Big Launches, All Launches")
     print(f"🎯 Filter: Launching 3+ days from now")
-    print(f"🚀 Early exit: Will stop at first valid product to save tokens")
+    print(f"🚀 Early exit: Will stop at first valid NEW product")
     print(f"{'='*60}")
     
     # Fetch a reasonable batch to find at least one valid product
-    # We'll stop as soon as we find one
     fetch_limit = 10  # Small batch to minimize tokens
     
     products = scrape_muncheye_products(
@@ -550,32 +556,29 @@ def get_products_for_review(limit=1, categories=None):
     
     print(f"\n✅ Found {len(products)} total products from Big Launches & All Launches")
     
-    if not products:
-        print("❌ No products found in target sections")
-        return []
-    
     # Process products one at a time to find first valid one
     from datetime import datetime, timedelta
     from config import MIN_DAYS_AHEAD
+    from slugify import slugify
     
     today = datetime.now().date()
     min_launch_date = today + timedelta(days=MIN_DAYS_AHEAD)
     
-    print(f"\n📅 Looking for first valid product:")
+    print(f"\n📅 Looking for first valid NEW product:")
     print(f"   Today: {today.strftime('%Y-%m-%d')}")
     print(f"   Minimum launch date: {min_launch_date.strftime('%Y-%m-%d')} ({MIN_DAYS_AHEAD}+ days)")
     
     seen = set()
     
     for product in products:
-        # Check for duplicates
+        # Check for duplicates in this batch
         product_key = f"{product['creator'].lower()}-{product['name'].lower()}"
         if product_key in seen:
-            print(f"   ⏭️  {product['name'][:40]}... duplicate, skipping")
+            print(f"   ⏭️  {product['name'][:40]}... duplicate in batch, skipping")
             continue
         seen.add(product_key)
         
-        # Check launch date
+        # Check launch date first (cheapest check)
         launch_date_str = product.get('launch_date')
         if not launch_date_str:
             print(f"   ⚠️  {product['name'][:40]}... no launch date, skipping")
@@ -585,18 +588,43 @@ def get_products_for_review(limit=1, categories=None):
             launch_date = datetime.strptime(launch_date_str, '%Y-%m-%d').date()
             days_until = (launch_date - today).days
             
-            if launch_date >= min_launch_date:
-                print(f"   ✅ {product['name'][:40]}... launches in {days_until} days - SELECTED!")
-                print(f"\n🎉 Found valid product! Stopping search to save tokens.")
-                return [product]  # Return immediately with first valid product
-            else:
+            if launch_date < min_launch_date:
                 print(f"   ⏭️  {product['name'][:40]}... too soon ({days_until} days)")
+                continue
+            
+            # NOW check if already reviewed (only after date check passes)
+            if existing_reviews:
+                product_name = product['name']
+                creator = product['creator']
+                
+                # Generate permalink to check database
+                permalink = slugify(f"{creator}-{product_name}-review")[:100]
+                
+                # Check if reviewed
+                normalized_name = product_name.strip().lower()
+                normalized_permalink = permalink.strip().lower()
+                
+                is_duplicate = (
+                    normalized_name in existing_reviews or
+                    normalized_permalink in existing_reviews or
+                    any(normalized_name in existing for existing in existing_reviews)
+                )
+                
+                if is_duplicate:
+                    print(f"   ⏭️  {product['name'][:40]}... already reviewed in database")
+                    continue
+            
+            # Product passed all checks!
+            print(f"   ✅ {product['name'][:40]}... launches in {days_until} days - SELECTED!")
+            print(f"\n🎉 Found valid NEW product! Stopping search to save tokens.")
+            return [product]  # Return immediately with first valid product
+                
         except Exception as e:
-            print(f"   ⚠️  {product['name'][:40]}... date error: {e}")
+            print(f"   ⚠️  {product['name'][:40]}... error: {e}")
+            continue
     
-    print(f"\n⚠️  No products found launching {MIN_DAYS_AHEAD}+ days from now")
+    print(f"\n⚠️  No NEW products found launching {MIN_DAYS_AHEAD}+ days from now")
     return []
-
 
 if __name__ == "__main__":
     # Test the scraper

@@ -45,7 +45,7 @@ def send_push_notification_safe(title, permalink, focus_kw):
 def main():
     print("=" * 60)
     print("🚀 MunchEye Product Review Generator")
-    print("⚡ Powered by Groq (Llama 3.1 70B) - Lightning Fast!")
+    print("⚡ Powered by Groq (Llama 3.3 70B) - Lightning Fast!")
     print("=" * 60)
     
     # Verify environment variables
@@ -62,44 +62,40 @@ def main():
     
     # Optional features status
     print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
-    print(f"🤖 AI Model: Groq Llama 3.1 70B (Free, Fast)")
+    print(f"🤖 AI Model: Groq Llama 3.3 70B (Free, Fast)")
     print(f"⚡ Speed: ~3-5 seconds per review")
     
-    # Get products to review
+    # STEP 1: Check existing reviews FIRST (before scraping)
     print(f"\n{'='*60}")
-    print(f"Step 1: Fetching Products from MunchEye")
-    print(f"🎯 Targeting: Big Launches & All Launches sections ONLY")
-    print(f"{'='*60}")
-    
-    # Get products from specific sections (only 1 product with early exit optimization)
-    initial_products = get_products_for_review(limit=1)
-    
-    if not initial_products:
-        print("❌ No products found in Big Launches or All Launches sections")
-        return
-    
-    print(f"\n✅ Found {len(initial_products)} products from target sections")
-    
-    # Step 2: Check for existing reviews
-    print(f"\n{'='*60}")
-    print(f"Step 2: Checking for Duplicate Reviews")
+    print(f"Step 1: Loading Existing Reviews Database")
     print(f"{'='*60}")
     
     existing_reviews = get_existing_reviews()
     display_review_stats()
     
-    # Filter out already reviewed products
-    products = filter_unreviewed_products(initial_products, existing_reviews)
+    print(f"\n✅ Loaded {len(existing_reviews)} existing reviews")
+    print(f"📊 Will check for duplicates during scraping")
+    
+    # STEP 2: Get products from MunchEye (with duplicate checking)
+    print(f"\n{'='*60}")
+    print(f"Step 2: Fetching NEW Products from MunchEye")
+    print(f"🎯 Targeting: Big Launches & All Launches sections ONLY")
+    print(f"🔍 Filtering: Products launching 3+ days from now")
+    print(f"🚫 Skipping: Products already in database")
+    print(f"{'='*60}")
+    
+    # Pass existing_reviews to avoid duplicates during scraping
+    products = get_products_for_review(limit=1, existing_reviews=existing_reviews)
     
     if not products:
-        print("\n❌ All scraped products have already been reviewed!")
-        print("💡 Try again later when new products are launched on MunchEye")
+        print("\n❌ No new products found!")
+        print("💡 Reasons:")
+        print("   - All upcoming products already reviewed")
+        print("   - No products launching 3+ days from now")
+        print("   - Try again later when new products are added to MunchEye")
         return
     
-    # Limit to desired number
-    products = products[:POSTS_PER_RUN]
-    
-    print(f"\n✅ {len(products)} new products ready for review")
+    print(f"\n✅ {len(products)} new product ready for review")
     
     posts_generated = 0
     
@@ -119,7 +115,7 @@ def main():
         # Generate permalink
         permalink = slugify(f"{creator}-{product_name}-review")[:100]
         
-        # Double-check if review exists locally
+        # Triple-check if review exists locally (safety check)
         today = datetime.date.today().isoformat()
         post_path = f"{POSTS_DIR}/{today}-{permalink}.md"
         image_file = f"{IMAGES_DIR}/{permalink}.webp"
@@ -139,7 +135,7 @@ def main():
         try:
             # Scrape sales page
             print(f"\n{'='*60}")
-            print(f"Step 3: Extracting Product Information")
+            print(f"Step 3: Extracting Product Information from JV Page")
             print(f"{'='*60}")
             
             # Get JV Page URL and e-cover from MunchEye detail page
@@ -152,7 +148,7 @@ def main():
             if jv_page_url:
                 print(f"🚀 Using JV Page for scraping: {jv_page_url}")
             else:
-                print(f"⚠️  Falling back to MunchEye detail page for scraping")
+                print(f"⚠️  No JV Page found, falling back to MunchEye detail page")
 
             sales_data = scrape_sales_page(scrape_url)
             
@@ -163,11 +159,11 @@ def main():
             )
             
             if not has_sales_data:
-                print(f"\n⚠️  Sales page data incomplete or unavailable")
+                print(f"\n⚠️  JV Page data incomplete or unavailable")
                 print(f"🌐 Falling back to web search for product info and images...")
                 sales_data = search_product_info(product_name, creator)
             else:
-                print(f"✅ Sales page data extracted successfully")
+                print(f"✅ JV Page data extracted successfully")
                 print(f"   Features: {len(sales_data.get('features', []))}")
                 print(f"   Images: {len(sales_data.get('images', []))}")
             
@@ -229,8 +225,8 @@ def main():
             
             # Strategy 3: If no JV images, search web
             if not featured_image_set:
-                print(f"\n⚠️  Could not get image from sales page")
-                print(f"🔍 Strategy: Searching web for product images...")
+                print(f"\n⚠️  Could not get image from JV page")
+                print(f"🔍 Strategy 3: Searching web for product images...")
                 print(f"📡 Sources: Bing, DuckDuckGo, Product Hunt, Reddit")
                 
                 from web_image_search import get_product_image_from_web
@@ -252,7 +248,6 @@ def main():
             else:
                 print(f"\n⚠️  No featured image could be set")
                 print(f"💡 Post will be published without featured image")
-                # Note: Jekyll can handle posts without featured images
             
             # Save post
             print(f"\n{'='*60}")
@@ -268,7 +263,7 @@ def main():
             
             # Log to database immediately after saving post
             print(f"\n{'='*60}")
-            print(f"Step 7: Logging to Reviews Database")
+            print(f"Step 8: Logging to Reviews Database")
             print(f"{'='*60}")
             
             try:
@@ -277,7 +272,8 @@ def main():
                     focus_kw=product_name,
                     permalink=permalink,
                     image_path=image_file,
-                    article_content=article_content
+                    article_content=article_content,
+                    indexing_status="Disabled"
                 )
                 
                 if success:
@@ -289,24 +285,15 @@ def main():
                 print(f"⚠️  Database logging failed: {e}")
             
             print(f"\n{'='*60}")
-            print(f"✅ SUCCESS! Review {i} Generated")
+            print(f"✅ SUCCESS! Review Generated")
             print(f"{'='*60}")
             print(f"📰 Title: {product_name} Review")
             print(f"🌐 URL: {post_url}")
             
             posts_generated += 1
             
-            # Post-generation tasks (only after last post)
+            # Send push notification (optional)
             if i == len(products):
-                # Wait for GitHub Pages deployment
-                print(f"\n{'='*60}")
-                print(f"Step 8: Post-Generation Complete")
-                print(f"{'='*60}")
-                print(f"💡 This is non-critical, continuing...")
-                import traceback
-                traceback.print_exc()
-                
-                # Send push notification (optional)
                 try:
                     send_push_notification_safe(
                         title=f"{product_name} Review",
@@ -330,7 +317,6 @@ def main():
     print(f"{'='*60}")
     print(f"✅ Reviews generated: {posts_generated}")
     print(f"📊 Products processed: {len(products)}")
-
 
 if __name__ == "__main__":
     main()
