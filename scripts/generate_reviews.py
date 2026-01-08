@@ -302,9 +302,9 @@ def main():
                 print(f"\n{'='*60}")
                 print(f"Step 8: Post-Generation Complete")
                 print(f"{'='*60}")
-                    print(f"💡 This is non-critical, continuing...")
-                    import traceback
-                    traceback.print_exc()
+                print(f"💡 This is non-critical, continuing...")
+                import traceback
+                traceback.print_exc()
                 
                 # Send push notification (optional)
                 try:
