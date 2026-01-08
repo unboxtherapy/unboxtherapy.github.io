@@ -9,12 +9,12 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 def scrape_sales_page(url):
     """
-    Scrape product sales page for review information
+    Scrape product sales/JV page for comprehensive review information
     
     Returns:
-        dict with extracted information
+        dict with extracted information including full page content
     """
-    print(f"\n🔍 Scraping sales page: {url[:60]}...")
+    print(f"\n🔍 Scraping sales/JV page: {url[:60]}...")
     
     try:
         headers = {'User-Agent': USER_AGENT}
@@ -22,6 +22,10 @@ def scrape_sales_page(url):
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove script and style elements for cleaner text
+        for script in soup(["script", "style", "noscript"]):
+            script.decompose()
         
         # Extract comprehensive information
         sales_data = {
@@ -36,20 +40,114 @@ def scrape_sales_page(url):
             'vendor_info': extract_vendor_info(soup),
             'guarantee': extract_guarantee(soup),
             'final_url': response.url,
-            'page_content': soup.get_text(separator=' ', strip=True)[:5000]
+            # Get MORE page content for comprehensive articles
+            'page_content': soup.get_text(separator=' ', strip=True)[:8000]  # Increased from 5000
         }
         
-        print(f"✅ Successfully scraped sales page")
+        print(f"✅ Successfully scraped sales/JV page")
         print(f"   Title: {sales_data['title'][:60]}...")
-        print(f"   Features found: {len(sales_data['features'])}")
-        print(f"   Images found: {len(sales_data['images'])}")
+        print(f"   Features: {len(sales_data['features'])}")
+        print(f"   Images: {len(sales_data['images'])}")
+        print(f"   Page content: {len(sales_data['page_content'])} chars")
         
         return sales_data
         
     except Exception as e:
-        print(f"⚠️  Could not access sales page: {e}")
+        print(f"⚠️  Could not access sales/JV page: {e}")
         return None
 
+
+def extract_features(soup):
+    """Extract product features more comprehensively"""
+    features = []
+    
+    # Strategy 1: Look for feature-related sections
+    feature_keywords = [
+        'feature', 'benefit', 'include', 'what you get', 'capability',
+        'what\'s included', 'inside', 'module', 'component'
+    ]
+    
+    for keyword in feature_keywords:
+        # Find headers mentioning features
+        headers = soup.find_all(['h2', 'h3', 'h4'], text=re.compile(keyword, re.IGNORECASE))
+        
+        for header in headers:
+            # Get list items after header
+            next_list = header.find_next(['ul', 'ol'])
+            if next_list:
+                items = next_list.find_all('li')
+                for item in items:
+                    feature_text = item.get_text(strip=True)
+                    if feature_text and len(feature_text) > 10 and len(feature_text) < 500:
+                        features.append(feature_text)
+            
+            # Also check for div/p after header
+            next_content = header.find_next(['div', 'p'])
+            if next_content and not next_content.find_parent(['ul', 'ol']):
+                text = next_content.get_text(strip=True)
+                if text and len(text) > 20 and len(text) < 500:
+                    features.append(text)
+    
+    # Strategy 2: Look for checkmark/bullet lists
+    checkmark_sections = soup.find_all(['div', 'section'], class_=re.compile(r'feature|benefit|check'))
+    for section in checkmark_sections[:5]:
+        items = section.find_all(['li', 'p'])
+        for item in items:
+            text = item.get_text(strip=True)
+            if text and len(text) > 10 and len(text) < 500:
+                features.append(text)
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_features = []
+    for f in features:
+        f_lower = f.lower()
+        if f_lower not in seen and len(f) > 10:
+            seen.add(f_lower)
+            unique_features.append(f)
+    
+    print(f"   📋 Extracted {len(unique_features)} features from page")
+    return unique_features[:25]  # Return top 25 features
+
+
+def extract_benefits(soup):
+    """Extract product benefits more comprehensively"""
+    benefits = []
+    
+    benefit_keywords = [
+        'benefit', 'advantage', 'why', 'solve', 'help you',
+        'perfect for', 'ideal for', 'great for', 'best for'
+    ]
+    
+    for keyword in benefit_keywords:
+        # Find sections mentioning benefits
+        sections = soup.find_all(['div', 'section', 'p'], text=re.compile(keyword, re.IGNORECASE))
+        
+        for section in sections[:5]:
+            text = section.get_text(strip=True)
+            if len(text) > 30 and len(text) < 800:
+                benefits.append(text)
+    
+    # Look for bullet points near benefit keywords
+    benefit_lists = soup.find_all('ul', class_=re.compile(r'benefit|advantage'))
+    for ul in benefit_lists:
+        items = ul.find_all('li')
+        for item in items:
+            text = item.get_text(strip=True)
+            if text and len(text) > 20:
+                benefits.append(text)
+    
+    # Remove duplicates
+    seen = set()
+    unique_benefits = []
+    for b in benefits:
+        b_lower = b.lower()
+        if b_lower not in seen:
+            seen.add(b_lower)
+            unique_benefits.append(b)
+    
+    print(f"   ✨ Extracted {len(unique_benefits)} benefits from page")
+    return unique_benefits[:15]
 
 def extract_title(soup):
     """Extract product title"""

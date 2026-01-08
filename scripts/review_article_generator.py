@@ -5,210 +5,58 @@ import re
 import json
 
 
+# In review_article_generator.py, update the API call:
+
 def generate_review_article(product_data, sales_data, affiliate_link=""):
-    """
-    Generate comprehensive product review article with embedded images
+    """Generate comprehensive 2500+ word product review article"""
     
-    Args:
-        product_data: Dict from muncheye_scraper
-        sales_data: Dict from sales_page_scraper
-        affiliate_link: Affiliate URL (empty by default)
+    # ... (all the prompt code from above) ...
     
-    Returns:
-        Complete article in Jekyll format
-    """
-    
-    product_name = product_data['name']
-    creator = product_data['creator']
-    price = product_data['price']
-    commission = product_data['commission']
-    platform = product_data['platform']
-    launch_date = product_data['launch_date']
-    
-    features = sales_data.get('features', [])
-    description = sales_data.get('description', '')
-    benefits = sales_data.get('benefits', [])
-    pricing_info = sales_data.get('pricing', [])
-    bonuses = sales_data.get('bonuses', [])
-    guarantee = sales_data.get('guarantee', '')
-    images = sales_data.get('images', [])
-    
-    # Prepare image information for AI (only product screenshots)
-    image_list = []
-    for idx, img in enumerate(images[:5], 1):  # Limit to TOP 5 images only
-        image_list.append({
-            'id': f'image_{idx}',
-            'url': img['url'],
-            'alt': img.get('alt', f'{product_name} screenshot {idx}'),
-            'markdown': f'![{img.get("alt", product_name)}]({img["url"]})'
-        })
-    
-    prompt = f"""
-Write a comprehensive, unbiased product review for: {product_name} by {creator}
-
-PRODUCT INFORMATION:
-- Name: {product_name}
-- Creator: {creator}
-- Price: ${price}
-- Platform: {platform}
-- Launch Date: {launch_date}
-- Description: {description}
-
-FEATURES:
-{json.dumps(features, indent=2)}
-
-BENEFITS:
-{json.dumps(benefits, indent=2)}
-
-BONUSES:
-{json.dumps(bonuses, indent=2)}
-
-GUARANTEE:
-{guarantee}
-
-AVAILABLE IMAGES FROM JV PAGE:
-{json.dumps(image_list, indent=2)}
-
-CRITICAL IMAGE RULES:
-✗ DO NOT use emoji images (🔥, 💡, ⚡, 🎯, etc.)
-✗ DO NOT add any decorative icons or symbols as images
-✗ ONLY use actual product screenshots/interface images from the list above
-✗ NO affiliate marketer photos, NO personal photos, NO model photos
-✓ Only embed images that show: product dashboard, features, workflows, pricing tables
-✓ Use 2-3 images MAXIMUM throughout the article
-✓ Only use images if they clearly show the product interface/features
-✓ Skip images that show people's faces or promotional models
-
-IMAGE PLACEMENT GUIDELINES:
-- After "What is {product_name}?" section (product overview/dashboard)
-- In "Key Features" section (ONE feature screenshot only)
-- In "How Does It Work?" section (workflow/process image)
-- DO NOT add images just for decoration
-
-ARTICLE STRUCTURE:
-
-1. **Introduction** (2-3 paragraphs)
-   - Hook with the problem this product solves
-   - Brief overview of what the product is
-   - Who it's for
-   - NO IMAGES in introduction
-
-2. **What is {product_name}?** (H2)
-   - Detailed explanation
-   - Main purpose and functionality
-   - Target audience
-   - [ADD ONE PRODUCT INTERFACE IMAGE HERE IF AVAILABLE]
-
-3. **Key Features** (H2)
-   - List 5-10 main features with explanations
-   - Use H3 subheadings for each major feature
-   - [ADD ONE FEATURE SCREENSHOT IF AVAILABLE]
-   - Include practical use cases
-
-4. **How Does It Work?** (H2)
-   - Step-by-step process
-   - User experience overview
-   - [ADD ONE WORKFLOW IMAGE IF AVAILABLE]
-
-5. **Benefits of Using {product_name}** (H2)
-   - Concrete benefits
-   - Real-world applications
-   - Time/money savings
-   - NO IMAGES in this section
-
-6. **Pricing & Packages** (H2)
-   - Price breakdown (${price})
-   - Value analysis
-   - Money-back guarantee details
-   - NO affiliate links or buttons
-
-7. **Pros and Cons** (H2)
-   - Honest pros (5-7 points)
-   - Honest cons (3-5 points)
-   - Use tables for comparison
-
-8. **Who Should Buy {product_name}?** (H2)
-   - Ideal customers
-   - Who will benefit most
-   - Who shouldn't buy (be honest)
-
-9. **Bonuses & Special Offers** (H2)
-   - List bonus items
-   - Limited-time offers
-   - NO affiliate promotions
-
-10. **{product_name} vs Competitors** (H2)
-    - Comparison with 2-3 similar products
-    - Unique selling points
-    - Comparison table
-
-11. **Frequently Asked Questions** (H2)
-    - 8-10 relevant questions with answers
-    - Use H3 for each question
-
-12. **Final Verdict** (H2)
-    - Overall assessment
-    - Rating (X/10)
-    - Final recommendation
-    - NO call-to-action or affiliate links
-
-WRITING STYLE:
-- Write for a 10-year-old's reading level
-- Use "you" to address readers
-- Max 3 sentences per paragraph
-- Conversational but professional tone
-- Include specific examples
-- Be honest about limitations
-- Use bullet points and lists where appropriate
-- Include comparison tables
-- Add "Quick Summary" boxes
-
-SEO OPTIMIZATION:
-- Naturally include product name throughout
-- Use semantic keywords: software review, {creator} product, {platform} launch, digital marketing tools
-- Include LSI keywords: features, benefits, pricing, honest review, worth it
-- Meta-friendly structure
-
-SPECIAL ELEMENTS:
-- Add a "Quick Verdict" box at the top after intro
-- Include pricing calculator if relevant
-- Use comparison tables
-- Add "Key Takeaways" box before conclusion
-
-CRITICAL REQUIREMENTS:
-- Article must be AT LEAST 2500 words (MINIMUM - aim for 3000+ words)
-- Write in Jekyll format (NO front matter, that's added separately)
-- Use H2, H3, H4 headings (NO H1)
-- Be balanced - include genuine cons
-- Include affiliate disclosure: "This review contains affiliate links, meaning we may earn a commission if you make a purchase through our links at no extra cost to you."
-- DO NOT include any affiliate links, buttons, or CTAs in the content
-- Focus on informative, educational content only
-- Add comparison tables in markdown format
-- Include FAQ schema-friendly format
-- MAXIMUM 3 images total in the entire article
-- ONLY product interface/screenshot images - NO decorative images
-- NO emoji images or icon graphics
-
-Write the complete article now with ONLY relevant product images embedded (maximum 3):
-"""
-    
-    print("🤖 Generating comprehensive review article...")
+    print("🤖 Generating comprehensive 2500+ word review article...")
     print("⚡ Using Groq (Llama 3.3 70B) - Lightning fast inference!")
+    print("📊 Target: 2500-3500 words for thorough coverage")
     
-    response_text = generate_content(prompt, max_tokens=4000)
+    # Use higher token limit for longer articles
+    # ~4000 tokens ≈ 3000 words output
+    response_text = generate_content(
+        prompt, 
+        max_tokens=5000,  # Increased from 4000
+        temperature=0.7    # Slightly creative but focused
+    )
     
     content = remove_front_matter(response_text)
     
-    # Remove any emoji or decorative images that AI might have added
-    # Pattern: ![emoji or single char](url)
-    content = re.sub(r'!\[[\U0001F300-\U0001F9FF].*?\]\(.*?\)', '', content)  # Remove emoji images
-    content = re.sub(r'!\[[🔥💡⚡🎯✨🚀💪👍✅❌⚠️📊📈📉💰🎁]\]\(.*?\)', '', content)  # Common emojis
+    # Remove any emoji images
+    content = re.sub(r'!\[[\U0001F300-\U0001F9FF].*?\]\(.*?\)', '', content)
+    content = re.sub(r'!\[[🔥💡⚡🎯✨🚀💪👍✅❌⚠️📊📈📉💰🎁]\]\(.*?\)', '', content)
     
-    print(f"✅ Article generated ({len(content)} characters)")
+    # Fix markdown table formatting issues
+    # Replace incorrect separators with proper ones
+    content = re.sub(r'\|\s*—+\s*\|', '|----------|', content)
+    content = re.sub(r'\|\s*-+\s*\|', '|----------|', content)
+    content = re.sub(r'\|--+\|', '|----------|', content)
+    
+    # Ensure proper spacing in tables
+    content = re.sub(r'\|\s+\|', '| |', content)
+    
+    word_count = len(content.split())
+    print(f"✅ Article generated:")
+    print(f"   📝 Characters: {len(content):,}")
+    print(f"   📖 Words: ~{word_count:,}")
     
     # Count embedded images
     image_count = len(re.findall(r'!\[.*?\]\(.*?\)', content))
-    print(f"📸 Embedded {image_count} images in the article")
+    print(f"   📸 Images: {image_count}")
+    
+    # Count tables
+    table_count = len(re.findall(r'\|.*\|.*\n\|[-]+\|', content))
+    print(f"   📊 Tables: {table_count}")
+    
+    if word_count < 2500:
+        print(f"⚠️  WARNING: Article is shorter than target ({word_count} words)")
+        print(f"💡 Consider providing more detailed JV page content")
+    else:
+        print(f"✅ Article meets length requirement ({word_count} words)")
     
     return content
 
