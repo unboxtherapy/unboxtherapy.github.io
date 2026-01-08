@@ -6,7 +6,7 @@ from slugify import slugify
 
 # Import all modules
 from config import *
-from muncheye_scraper import get_products_for_review
+from muncheye_scraper import get_products_for_review, get_muncheye_detail_info
 from sales_page_scraper import scrape_sales_page, search_product_info
 from json_tracker import (
     get_existing_reviews, 
@@ -142,7 +142,19 @@ def main():
             print(f"Step 3: Extracting Product Information")
             print(f"{'='*60}")
             
-            sales_data = scrape_sales_page(product['url'])
+            # Get JV Page URL and e-cover from MunchEye detail page
+            detail_info = get_muncheye_detail_info(product['url'])
+            jv_page_url = detail_info['jv_page_url']
+            ecover_url = detail_info['ecover_url']
+            
+            scrape_url = jv_page_url if jv_page_url else product['url']
+            
+            if jv_page_url:
+                print(f"🚀 Using JV Page for scraping: {jv_page_url}")
+            else:
+                print(f"⚠️  Falling back to MunchEye detail page for scraping")
+
+            sales_data = scrape_sales_page(scrape_url)
             
             # Check if we got good data from sales page
             has_sales_data = (
@@ -195,17 +207,27 @@ def main():
             
             featured_image_set = False
             
-            # Strategy 1: Try sales page images
-            if sales_data.get('images') and len(sales_data['images']) > 0:
-                print(f"📸 Found {len(sales_data['images'])} images available")
-                print(f"🎯 Strategy: Using images from sales page/web search")
+            # Strategy 1: Try e-cover from MunchEye (highest quality)
+            if ecover_url:
+                print(f"📸 E-cover found from MunchEye detail page")
+                print(f"🎯 Strategy 1: Using official e-cover image")
+                
+                featured_image_set = try_download_featured_image(
+                    [{'url': ecover_url, 'alt': f'{product_name} Official E-cover'}],
+                    image_file
+                )
+            
+            # Strategy 2: Try JV Page images
+            if not featured_image_set and sales_data.get('images') and len(sales_data['images']) > 0:
+                print(f"\n📸 Found {len(sales_data['images'])} images from JV Page")
+                print(f"🎯 Strategy 2: Using images from JV page")
                 
                 featured_image_set = try_download_featured_image(
                     sales_data['images'],
                     image_file
                 )
             
-            # Strategy 2: If no sales images, search web
+            # Strategy 3: If no JV images, search web
             if not featured_image_set:
                 print(f"\n⚠️  Could not get image from sales page")
                 print(f"🔍 Strategy: Searching web for product images...")

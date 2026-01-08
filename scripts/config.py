@@ -32,8 +32,9 @@ OPTIMIZE_IMAGE = True
 WAIT_TIME_BEFORE_INDEXING = 180  # seconds (3 minutes)
 
 # MunchEye Settings
-MUNCHEYE_SECTIONS = ['just_launched', 'big_launches']  # Only these sections
+MUNCHEYE_SECTIONS = ['big_launches', 'all_launches']  # Target upcoming launches only
 REVIEW_RECENT_DAYS = 14
+MIN_DAYS_AHEAD = 3  # Only include products launching 3+ days from now
 
 # Google Indexing (Optional)
 GOOGLE_SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")

@@ -11,6 +11,68 @@ MUNCHEYE_URL = "https://muncheye.com/"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 
+
+def get_muncheye_detail_info(detail_url):
+    """
+    Extract the JV Page URL and e-cover image from a MunchEye product detail page
+    
+    Returns:
+        dict: {'jv_page_url': str or None, 'ecover_url': str or None}
+    """
+    print(f"🔍 Extracting info from MunchEye detail page: {detail_url}")
+    try:
+        headers = {
+            'User-Agent': USER_AGENT,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        }
+        response = requests.get(detail_url, headers=headers, timeout=20)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        result = {
+            'jv_page_url': None,
+            'ecover_url': None
+        }
+        
+        # Extract JV Page URL
+        jv_label = soup.find('td', text=re.compile(r'JV\s+Page:', re.IGNORECASE))
+        if not jv_label:
+            # Try finding b tag inside td
+            jv_label = soup.find('b', text=re.compile(r'JV\s+Page:', re.IGNORECASE))
+            if jv_label:
+                jv_label = jv_label.find_parent('td')
+        
+        if jv_label:
+            # The URL should be in the next td
+            next_td = jv_label.find_next_sibling('td')
+            if next_td:
+                link = next_td.find('a', href=True)
+                if link:
+                    result['jv_page_url'] = link['href']
+                    print(f"✅ Found JV Page: {result['jv_page_url']}")
+        
+        # Extract e-cover image
+        product_logo = soup.find('div', class_='product_logo')
+        if product_logo:
+            img = product_logo.find('img', itemprop='image')
+            if img and img.get('src'):
+                result['ecover_url'] = img['src']
+                print(f"✅ Found e-cover: {result['ecover_url']}")
+        
+        if not result['jv_page_url']:
+            print("⚠️  JV Page link not found on detail page")
+        if not result['ecover_url']:
+            print("⚠️  E-cover image not found on detail page")
+        
+        return result
+        
+    except Exception as e:
+        print(f"❌ Error extracting MunchEye info: {e}")
+        return {'jv_page_url': None, 'ecover_url': None}
+
+
+
 def scrape_muncheye_products(sections=None, limit_per_section=5):
     """
     Scrape products from specific MunchEye sections using AI
@@ -181,76 +243,74 @@ def parse_with_beautifulsoup(html_content, sections, limit_per_section):
     soup = BeautifulSoup(html_content, 'html.parser')
     products = []
     
-    # Strategy 1: Look for "Just Launched" section specifically
-    print(f"\n📍 Looking for 'Just Launched' section...")
+    # Strategy 1: Look for "Big Launches" section
+    print(f"\n📍 Looking for 'Big Launches' section...")
+    big_launches_heading = soup.find(['h2', 'h3', 'div', 'span'], 
+                                     text=re.compile(r'Big\s+Launch', re.IGNORECASE))
     
-    # Find the "Just Launched" heading
-    just_launched_heading = soup.find(['h2', 'h3', 'div', 'span'], 
-                                     text=re.compile(r'Just\s+Launched', re.IGNORECASE))
-    
-    if just_launched_heading:
-        print(f"✅ Found 'Just Launched' section header")
+    if big_launches_heading:
+        print(f"✅ Found 'Big Launches' section header")
         
         # Get all links after this heading until next major heading
-        current = just_launched_heading.find_next()
+        current = big_launches_heading.find_next()
         count = 0
         
         while current and count < 50:  # Check next 50 elements
             # Stop if we hit another major section
-            if current.name in ['h2', 'h3'] and current != just_launched_heading:
+            if current.name in ['h2', 'h3'] and current != big_launches_heading:
                 section_text = current.get_text(strip=True).lower()
-                if any(x in section_text for x in ['big launch', 'coming soon', 'yesterday']):
+                if any(x in section_text for x in ['all launch', 'just launched', 'coming soon']):
                     print(f"📍 Stopped at next section: {section_text}")
                     break
             
             # Look for product links
             if current.name == 'a' and current.get('href'):
-                product = extract_product_from_link(current, "Just Launched")
+                product = extract_product_from_link(current, "Big Launches")
                 if product and product not in products:
                     products.append(product)
             
             # Also check children for links
             links = current.find_all('a', href=True, recursive=False)
             for link in links:
-                product = extract_product_from_link(link, "Just Launched")
+                product = extract_product_from_link(link, "Big Launches")
                 if product and product not in products:
                     products.append(product)
             
             current = current.find_next()
             count += 1
     
-    print(f"📊 Found {len(products)} products from Just Launched section")
+    print(f"📊 Found {len(products)} products from Big Launches section")
     
-    # Strategy 2: Also try finding Big Launches
-    print(f"\n📍 Looking for 'Big Launches' section...")
-    big_launches = soup.find(['h2', 'h3', 'div'], text=re.compile(r'Big\s+Launch', re.IGNORECASE))
+    # Strategy 2: Also try finding All Launches
+    print(f"\n📍 Looking for 'All Launches' section...")
+    all_launches = soup.find(['h2', 'h3', 'div', 'button'], text=re.compile(r'All\s+Launch', re.IGNORECASE))
     
-    if big_launches:
-        print(f"✅ Found 'Big Launches' section")
-        current = big_launches.find_next()
+    if all_launches:
+        print(f"✅ Found 'All Launches' section")
+        current = all_launches.find_next()
         count = 0
-        big_launch_products = []
+        all_launch_products = []
         
-        while current and count < 30:
-            if current.name in ['h2', 'h3'] and current != big_launches:
+        while current and count < 50:
+            if current.name in ['h2', 'h3'] and current != all_launches:
                 break
             
             if current.name == 'a' and current.get('href'):
-                product = extract_product_from_link(current, "Big Launches")
-                if product and product not in products and product not in big_launch_products:
-                    big_launch_products.append(product)
+                product = extract_product_from_link(current, "All Launches")
+                if product and product not in products and product not in all_launch_products:
+                    all_launch_products.append(product)
             
             links = current.find_all('a', href=True, recursive=False)
             for link in links:
-                product = extract_product_from_link(link, "Big Launches")
-                if product and product not in products and product not in big_launch_products:
-                    big_launch_products.append(product)
+                product = extract_product_from_link(link, "All Launches")
+                if product and product not in products and product not in all_launch_products:
+                    all_launch_products.append(product)
             
             current = current.find_next()
             count += 1
         
-        products.extend(big_launch_products)
-        print(f"📊 Found {len(big_launch_products)} products from Big Launches")
+        products.extend(all_launch_products)
+        print(f"📊 Found {len(all_launch_products)} products from All Launches")
     
     print(f"\n✅ Total products from fallback parser: {len(products)}")
     return products[:limit_per_section * 2]  # Return more products
@@ -367,20 +427,63 @@ def extract_date(text):
     return today.strftime('%Y-%m-%d')
 
 
+
+def filter_upcoming_launches(products, min_days_ahead=3):
+    """
+    Filter products to only include those launching 3+ days from now
+    
+    Args:
+        products: List of product dicts with 'launch_date' field
+        min_days_ahead: Minimum days ahead to include (default: 3)
+    
+    Returns:
+        List of products launching min_days_ahead or more from now
+    """
+    from datetime import datetime, timedelta
+    
+    today = datetime.now().date()
+    min_launch_date = today + timedelta(days=min_days_ahead)
+    
+    print(f"\n📅 Date Filtering:")
+    print(f"   Today: {today.strftime('%Y-%m-%d')}")
+    print(f"   Minimum launch date: {min_launch_date.strftime('%Y-%m-%d')} ({min_days_ahead}+ days)")
+    
+    filtered = []
+    for product in products:
+        launch_date_str = product.get('launch_date')
+        if launch_date_str:
+            try:
+                launch_date = datetime.strptime(launch_date_str, '%Y-%m-%d').date()
+                if launch_date >= min_launch_date:
+                    filtered.append(product)
+                    days_until = (launch_date - today).days
+                    print(f"   ✅ {product['name'][:40]}... launches in {days_until} days")
+                else:
+                    days_until = (launch_date - today).days
+                    print(f"   ⏭️  {product['name'][:40]}... too soon ({days_until} days)")
+            except Exception as e:
+                print(f"   ⚠️  {product['name'][:40]}... invalid date: {launch_date_str}")
+    
+    print(f"\n📊 {len(filtered)}/{len(products)} products launching {min_days_ahead}+ days from now")
+    return filtered
+
+
 def get_products_for_review(limit=5, categories=None):
     """
-    Get products ready for review from Big Launches and Just Launched sections
+    Get upcoming product launches from Big Launches and All Launches sections
+    Only includes products launching 3+ days from now
     """
     print(f"\n{'='*60}")
-    print(f"🎯 Fetching products from MunchEye")
-    print(f"🎯 Target sections: Big Launches, Just Launched")
+    print(f"🎯 Fetching UPCOMING launches from MunchEye")
+    print(f"🎯 Target sections: Big Launches, All Launches")
+    print(f"🎯 Filter: Launching 3+ days from now")
     print(f"{'='*60}")
     
     # Scrape products with increased limit to account for filtering
-    fetch_limit = limit * 2
+    fetch_limit = limit * 3  # Increased since we'll filter by date
     
     products = scrape_muncheye_products(
-        sections=['big_launches', 'just_launched'],
+        sections=['big_launches', 'all_launches'],
         limit_per_section=fetch_limit
     )
     
@@ -388,7 +491,7 @@ def get_products_for_review(limit=5, categories=None):
         print("❌ No products found in target sections")
         return []
     
-    print(f"\n✅ Found {len(products)} total products from Big Launches & Just Launched")
+    print(f"\n✅ Found {len(products)} total products from Big Launches & All Launches")
     
     # Remove duplicates
     seen = set()
@@ -401,9 +504,17 @@ def get_products_for_review(limit=5, categories=None):
     
     print(f"✅ {len(unique_products)} unique products after deduplication")
     
+    # Filter by launch date (3+ days from now)
+    from config import MIN_DAYS_AHEAD
+    filtered_products = filter_upcoming_launches(unique_products, MIN_DAYS_AHEAD)
+    
+    if not filtered_products:
+        print(f"\n⚠️  No products found launching {MIN_DAYS_AHEAD}+ days from now")
+        return []
+    
     # Show breakdown by section
     section_counts = {}
-    for p in unique_products:
+    for p in filtered_products:
         section = p.get('section', 'Unknown')
         section_counts[section] = section_counts.get(section, 0) + 1
     
@@ -411,7 +522,7 @@ def get_products_for_review(limit=5, categories=None):
     for section, count in section_counts.items():
         print(f"   - {section}: {count} products")
     
-    return unique_products
+    return filtered_products
 
 
 if __name__ == "__main__":
@@ -421,7 +532,7 @@ if __name__ == "__main__":
     
     if products:
         print(f"\n{'='*60}")
-        print(f"📊 Sample Products from Big Launches & Just Launched")
+        print(f"📊 Sample Upcoming Launches (3+ Days Out)")
         print(f"{'='*60}")
         
         for i, product in enumerate(products[:10], 1):

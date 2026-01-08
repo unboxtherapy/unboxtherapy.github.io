@@ -180,6 +180,12 @@ def extract_images(soup, base_url):
     """Extract product images - prioritize high-quality screenshots, filter out ads"""
     images = []
     
+    # Check if this is a JV Page (typically contains 'jv' in the URL)
+    is_jv_page = 'jv' in base_url.lower()
+    
+    if is_jv_page:
+        print("📋 Detected JV Page - using relaxed image filtering")
+    
     img_tags = soup.find_all('img')
     
     # Score images based on relevance
@@ -193,18 +199,29 @@ def extract_images(soup, base_url):
         if not src.startswith('http'):
             src = urljoin(base_url, src)
         
-        # Skip unwanted images (EXPANDED LIST)
-        skip_keywords = [
-            'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
-            'banner', 'ad', 'advertisement', 'promo', 'sidebar',
-            'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
-            'paypal', 'stripe', 'payment',  # Payment logos
-            'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
-            'testimonial', 'review-star', 'rating',  # Review graphics
-            'countdown', 'timer', 'urgent',  # Urgency graphics
-            '728x90', '300x250', '160x600', '468x60',  # Common ad sizes
-            'affiliate', 'commission', 'earn-money',  # Affiliate images
-        ]
+        # Skip unwanted images (RELAXED for JV pages)
+        if is_jv_page:
+            # For JV pages, only skip truly irrelevant images
+            skip_keywords = [
+                'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
+                'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
+                'paypal', 'stripe', 'payment',  # Payment logos
+                'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
+                'countdown', 'timer',  # Urgency graphics
+            ]
+        else:
+            # For non-JV pages, use stricter filtering
+            skip_keywords = [
+                'logo', 'icon', 'badge', 'button', 'social', 'avatar', 'gravatar',
+                'banner', 'ad', 'advertisement', 'promo', 'sidebar',
+                'jvzoo', 'warriorplus', 'clickbank',  # Affiliate platform logos
+                'paypal', 'stripe', 'payment',  # Payment logos
+                'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',  # Social icons
+                'testimonial', 'review-star', 'rating',  # Review graphics
+                'countdown', 'timer', 'urgent',  # Urgency graphics
+                '728x90', '300x250', '160x600', '468x60',  # Common ad sizes
+                'affiliate', 'commission', 'earn-money',  # Affiliate images
+            ]
         
         src_lower = src.lower()
         if any(skip in src_lower for skip in skip_keywords):
@@ -223,17 +240,20 @@ def extract_images(soup, base_url):
         alt = img.get('alt', '').lower()
         img_class = ' '.join(img.get('class', [])).lower()
         
-        # Skip if alt or class contains ad-related terms
-        if any(skip in alt for skip in skip_keywords):
+        # Skip if alt or class contains ad-related terms (still filter these)
+        if any(skip in alt for skip in ['icon', 'logo', 'badge', 'social']):
             continue
-        if any(skip in img_class for skip in skip_keywords):
+        if any(skip in img_class for skip in ['icon', 'logo', 'badge', 'social']):
             continue
         
         # Calculate relevance score
         score = 0
         
-        # High priority: product screenshots, features, dashboard
-        high_priority = ['screenshot', 'dashboard', 'interface', 'demo', 'preview', 'feature', 'app']
+        # High priority: product screenshots, features, dashboard, ecover, banner on JV pages
+        high_priority = ['screenshot', 'dashboard', 'interface', 'demo', 'preview', 'feature', 'app', 'ecover', 'product']
+        if is_jv_page:
+            high_priority.extend(['banner', 'promo', 'graphic', 'mockup', 'cover'])
+        
         if any(keyword in alt for keyword in high_priority):
             score += 10
         if any(keyword in img_class for keyword in high_priority):
@@ -242,7 +262,7 @@ def extract_images(soup, base_url):
             score += 5
         
         # Medium priority: general product images
-        medium_priority = ['product', 'software', 'app', 'tool', 'screen']
+        medium_priority = ['software', 'tool', 'screen', 'image']
         if any(keyword in alt for keyword in medium_priority):
             score += 5
         if any(keyword in src_lower for keyword in medium_priority):
@@ -261,6 +281,10 @@ def extract_images(soup, base_url):
         
         # Prefer images with descriptive alt text
         if alt and len(alt) > 10:
+            score += 2
+        
+        # For JV pages, give bonus to larger file names (often high-quality graphics)
+        if is_jv_page and any(ext in src_lower for ext in ['.png', '.jpg', '.jpeg']):
             score += 2
         
         # Only add images with positive score
