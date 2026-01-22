@@ -330,6 +330,27 @@ def search_product_images_web(product_name, creator="", limit=10):
     
     return result
 
+def search_and_get_product_images(product_name, creator="", limit=15):
+    """
+    Search for product images and return list for article embedding
+    
+    Args:
+        product_name: Product name
+        creator: Creator name
+        limit: Maximum images to return
+    
+    Returns:
+        List of image dicts
+    """
+    images = search_product_images_web(product_name, creator, limit)
+    
+    if images:
+        print(f"\n✅ Images ready for article embedding")
+        print(f"📝 Gemini will place these strategically in the review")
+    
+    return images
+
+
 
 def get_product_image_from_web(product_name, creator=""):
     """
