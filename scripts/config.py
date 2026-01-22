@@ -13,7 +13,7 @@ SITE_DOMAIN = "https://unboxtherapy.github.io"
 # AI Configuration - Using Google Gemini (free, powerful)
 AI_PROVIDER = "gemini"
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.5-flash-exp"  # Fast, efficient, great for long content
+GEMINI_MODEL = "gemini-2.5-flash"  # Fast, efficient, great for long content
 
 # Image generation (optional - now using sales page images instead)
 FREEPIK_API_KEY = os.environ.get("FREEPIK_API_KEY", "")
