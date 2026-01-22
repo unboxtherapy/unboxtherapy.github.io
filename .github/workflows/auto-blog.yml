@@ -23,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pillow requests beautifulsoup4 python-slugify lxml google-auth google-api-python-client google-generativeai
+          pip install google-generativeai pillow requests beautifulsoup4 python-slugify lxml google-auth google-api-python-client
 
       - name: Generate product reviews
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FREEPIK_API_KEY: ${{ secrets.FREEPIK_API_KEY }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           WEBPUSHR_API_KEY: ${{ secrets.WEBPUSHR_API_KEY }}
@@ -60,7 +60,7 @@ jobs:
           NEW_REVIEWS=$(git diff --cached --name-only | grep "_posts/" | wc -l || echo "0")
 
           if [ $NEW_REVIEWS -gt 0 ]; then
-            git commit -m "🎯 Added $NEW_REVIEWS new product review(s)"
+            git commit -m "🎯 Added $NEW_REVIEWS new product review(s) [Powered by Gemini]"
             git push origin master
             echo "✅ Successfully pushed $NEW_REVIEWS review(s)"
           else
