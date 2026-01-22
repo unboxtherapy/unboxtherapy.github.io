@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install groq pillow requests beautifulsoup4 python-slugify lxml google-auth google-api-python-client
+          pip install pillow requests beautifulsoup4 python-slugify lxml google-auth google-api-python-client google-generativeai
 
       - name: Generate product reviews
         env:
