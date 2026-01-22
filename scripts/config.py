@@ -10,10 +10,10 @@ REVIEWS_DB_FILE = "_data/reviews_database.json"
 # Site settings
 SITE_DOMAIN = "https://unboxtherapy.github.io"
 
-# AI Configuration - Using Groq (free, fast, never expires)
-AI_PROVIDER = "groq"
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GROQ_MODEL = "llama-3.3-70b-versatile"  # Faster, smaller, handles long context better
+# AI Configuration - Using Google Gemini (free, powerful)
+AI_PROVIDER = "gemini"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-2.0-flash-exp"  # Fast, efficient, great for long content
 
 # Image generation (optional - now using sales page images instead)
 FREEPIK_API_KEY = os.environ.get("FREEPIK_API_KEY", "")

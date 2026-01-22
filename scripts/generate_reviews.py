@@ -19,6 +19,7 @@ from review_article_generator import (
     create_review_front_matter,
     generate_image_prompt
 )
+from config import GEMINI_API_KEY
 from image_utils import try_download_featured_image, validate_image_file
 
 
@@ -45,15 +46,15 @@ def send_push_notification_safe(title, permalink, focus_kw):
 def main():
     print("=" * 60)
     print("🚀 MunchEye Product Review Generator")
-    print("⚡ Powered by Groq (Llama 3.3 70B) - Lightning Fast!")
+    print("⚡ Powered by Google Gemini - Powerful & Free!")
     print("=" * 60)
     
     # Verify environment variables
-    if not GROQ_API_KEY:
-        print("❌ GROQ_API_KEY not found")
-        print("🔗 Get free API key at: https://console.groq.com/")
+    if not GEMINI_API_KEY:
+        print("❌ GEMINI_API_KEY not found")
+        print("🔗 Get free API key at: https://aistudio.google.com/apikey")
         return
-    print("✅ GROQ_API_KEY found")
+    print("✅ GEMINI_API_KEY found")
     
     if not FREEPIK_API_KEY:
         print("⚠️  FREEPIK_API_KEY not found (optional - for fallback image generation)")
@@ -62,8 +63,8 @@ def main():
     
     # Optional features status
     print(f"📋 Push Notifications: {'✅ Enabled' if ENABLE_PUSH_NOTIFICATIONS else '❌ Disabled'}")
-    print(f"🤖 AI Model: Groq Llama 3.3 70B (Free, Fast)")
-    print(f"⚡ Speed: ~3-5 seconds per review")
+    print(f"🤖 AI Model: Google Gemini 2.0 Flash (Free, Powerful)")
+    print(f"⚡ Speed: ~5-10 seconds per review")
     
     # STEP 1: Check existing reviews FIRST (before scraping)
     print(f"\n{'='*60}")

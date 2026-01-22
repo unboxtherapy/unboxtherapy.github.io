@@ -1,6 +1,6 @@
 """Generate comprehensive product review articles WITHOUT embedded images"""
-from groq_client import generate_content
-from config import GROQ_API_KEY
+from gemini_client import generate_content
+from config import GEMINI_API_KEY
 import re
 import json
 
@@ -179,7 +179,7 @@ IMPORTANT REMINDERS:
 Begin the article now (NO front matter, NO images):"""
 
     print("🤖 Generating comprehensive 2500+ word review article...")
-    print("⚡ Using Groq (Llama 3.3 70B) - Lightning fast inference!")
+    print("⚡ Using Google Gemini - Powerful AI inference!")
     print("📊 Target: 2500-3500 words for thorough coverage")
     print("🚫 NO embedded images - featured image only")
     

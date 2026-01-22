@@ -1,10 +1,10 @@
-"""Scrape products from MunchEye.com - IMPROVED with section targeting"""
+"""Scrape products from MunchEye.com - OPTIMIZED for Gemini"""
 import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
-from groq_client import generate_content
-from config import GROQ_API_KEY
+from gemini_client import generate_content
+from config import GEMINI_API_KEY
 import json
 
 MUNCHEYE_URL = "https://muncheye.com/"
@@ -75,7 +75,7 @@ def get_muncheye_detail_info(detail_url):
 
 def scrape_muncheye_products(sections=None, limit_per_section=5):
     """
-    Scrape products from specific MunchEye sections using AI
+    Scrape products from specific MunchEye sections using Gemini AI
     """
     if sections is None:
         sections = ['big_launches', 'just_launched']
@@ -114,18 +114,18 @@ def scrape_muncheye_products(sections=None, limit_per_section=5):
 
 
 def parse_with_gemini(html_content, sections, limit_per_section):
-    """Use Groq AI to intelligently parse MunchEye HTML"""
+    """Use Google Gemini to intelligently parse MunchEye HTML"""
     
-    if not GROQ_API_KEY:
-        print("⚠️  Groq API key not available, using fallback parser")
+    if not GEMINI_API_KEY:
+        print("⚠️  Gemini API key not available, using fallback parser")
         return []
     
-    print(f"🤖 Using Groq AI (Llama 3.1 8B) to parse MunchEye sections...")
-    print(f"⚡ Lightning fast analysis incoming...")
+    print(f"🤖 Using Google Gemini to parse MunchEye sections...")
+    print(f"⚡ Analyzing extended HTML content (40,000 chars)...")
     
-    # Truncate HTML to stay within token limits (Groq: 12k TPM on free tier)
-    # ~4 chars per token, so 25k chars ≈ 6.25k tokens (safe margin)
-    html_sample = html_content[:25000]
+    # OPTIMIZED: Increased from 25k to 40k chars for better context
+    # Gemini handles longer context well with its 1M token window
+    html_sample = html_content[:60000]
     
     # Get current date for context
     from datetime import datetime, timedelta
@@ -148,7 +148,7 @@ TARGET SECTIONS ON MUNCHEYE.COM:
 - "Big Launches" (left-column) - PRIORITY
 - "All Launches" (right-column)
 
-HTML CONTENT:
+HTML CONTENT (Extended 40k chars for better analysis):
 {html_sample}
 
 YOUR MISSION: Find ONE product that meets ALL these requirements:
@@ -216,7 +216,7 @@ CRITICAL RULES - FOLLOW STRICTLY:
 RETURN ONLY THE JSON ARRAY NOW:"""
     
     try:
-        print(f"🔄 Sending HTML to Groq for analysis...")
+        print(f"📤 Sending HTML to Gemini for analysis...")
         response_text = generate_content(prompt, max_tokens=3000)
         
         # Clean response
@@ -232,7 +232,7 @@ RETURN ONLY THE JSON ARRAY NOW:"""
         products_data = json.loads(response_text)
         
         if not isinstance(products_data, list):
-            print(f"❌ Groq returned non-list data")
+            print(f"❌ Gemini returned non-list data")
             return []
         
         # Validate and enrich products
@@ -270,29 +270,29 @@ RETURN ONLY THE JSON ARRAY NOW:"""
             validated_products.append(validated_product)
             print(f"✅ Found: {validated_product['creator']}: {validated_product['name']} (${validated_product['price']}) - Section: {validated_product['section']}")
         
-        print(f"\n✅ Groq extracted {len(validated_products)} products from target sections")
+        print(f"\n✅ Gemini extracted {len(validated_products)} products from target sections")
         return validated_products
         
     except json.JSONDecodeError as e:
-        print(f"❌ Failed to parse Groq JSON response: {e}")
+        print(f"❌ Failed to parse Gemini JSON response: {e}")
         print(f"Response text: {response_text[:500]}...")
         return []
     except Exception as e:
-        print(f"❌ Groq parsing error: {e}")
+        print(f"❌ Gemini parsing error: {e}")
         import traceback
         traceback.print_exc()
         return []
 
 def parse_with_beautifulsoup(html_content, sections, limit_per_section):
     """Fallback parser using BeautifulSoup - targets correct MunchEye columns"""
-    print(f"🔄 Using BeautifulSoup fallback parser...")
+    print(f"📄 Using BeautifulSoup fallback parser...")
     
     soup = BeautifulSoup(html_content, 'html.parser')
     products = []
     
     # Strategy 1: Look for Big Launches in #left-column
     if 'big_launches' in sections:
-        print(f"\n📍 Looking for 'Big Launches' in #left-column...")
+        print(f"\n🔍 Looking for 'Big Launches' in #left-column...")
         left_column = soup.find('div', id='left-column')
         
         if left_column:
@@ -309,7 +309,7 @@ def parse_with_beautifulsoup(html_content, sections, limit_per_section):
     
     # Strategy 2: Look for All Launches in #right-column  
     if 'all_launches' in sections:
-        print(f"\n📍 Looking for 'All Launches' in #right-column...")
+        print(f"\n🔍 Looking for 'All Launches' in #right-column...")
         right_column = soup.find('div', id='right-column')
         
         if right_column:
@@ -525,7 +525,7 @@ def get_products_for_review(limit=1, categories=None, existing_reviews=None):
     """
     Get upcoming product launches from Big Launches and All Launches sections
     Only includes products launching 3+ days from now that haven't been reviewed yet
-    OPTIMIZED: Checks database during scraping to avoid wasting tokens
+    OPTIMIZED: Checks database during scraping to avoid wasting API calls
     
     Args:
         limit: Maximum products to return
@@ -543,7 +543,7 @@ def get_products_for_review(limit=1, categories=None, existing_reviews=None):
     print(f"{'='*60}")
     
     # Fetch a reasonable batch to find at least one valid product
-    fetch_limit = 10  # Small batch to minimize tokens
+    fetch_limit = 10  # Small batch to minimize API usage
     
     products = scrape_muncheye_products(
         sections=['big_launches', 'all_launches'],
@@ -616,7 +616,7 @@ def get_products_for_review(limit=1, categories=None, existing_reviews=None):
             
             # Product passed all checks!
             print(f"   ✅ {product['name'][:40]}... launches in {days_until} days - SELECTED!")
-            print(f"\n🎉 Found valid NEW product! Stopping search to save tokens.")
+            print(f"\n🎉 Found valid NEW product! Stopping search to save API calls.")
             return [product]  # Return immediately with first valid product
                 
         except Exception as e:
