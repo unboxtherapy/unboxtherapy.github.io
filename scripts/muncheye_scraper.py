@@ -125,7 +125,7 @@ def parse_with_gemini(html_content, sections, limit_per_section):
     
     # OPTIMIZED: Increased from 25k to 40k chars for better context
     # Gemini handles longer context well with its 1M token window
-    html_sample = html_content[:60000]
+    html_sample = html_content[:40000]
     
     # Get current date for context
     from datetime import datetime, timedelta
