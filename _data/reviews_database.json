@@ -609,5 +609,18 @@
     "indexing_status": "Disabled",
     "word_count": 3060,
     "published_date": "2026-01-28"
+  },
+  {
+    "timestamp": "2026-01-28T11:32:11.439489",
+    "title": "Product B Review",
+    "focus_kw": "Product B",
+    "permalink": "creator-b-product-b-review",
+    "url": "https://unboxtherapy.github.io/creator-b-product-b-review/",
+    "image_path": "images/creator-b-product-b-review.webp",
+    "image_url": "https://unboxtherapy.github.io/images/creator-b-product-b-review.webp",
+    "description": "Navigating the ever-evolving landscape of online business can often feel like trying to steer a ship through a perpetual storm. From managing endless tasks to deciphering complex data, the demands on ...",
+    "indexing_status": "Disabled",
+    "word_count": 2864,
+    "published_date": "2026-01-28"
   }
 ]
