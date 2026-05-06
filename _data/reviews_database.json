@@ -2442,5 +2442,18 @@
     "indexing_status": "Disabled",
     "word_count": 1234,
     "published_date": "2026-05-05"
+  },
+  {
+    "timestamp": "2026-05-06T02:49:11.192955",
+    "title": "Build apps with AI Review",
+    "focus_kw": "Build apps with AI",
+    "permalink": "simon-warner-build-apps-with-ai-review",
+    "url": "https://unboxtherapy.github.io/simon-warner-build-apps-with-ai-review/",
+    "image_path": "images/simon-warner-build-apps-with-ai-review.webp",
+    "image_url": "https://unboxtherapy.github.io/images/simon-warner-build-apps-with-ai-review.webp",
+    "description": "Unlocking the Future of Application Development: A Deep Dive into Simon Warner's \"Build apps with AI\" The landscape of software development is in constant flux, a dynamic arena where innovation is the...",
+    "indexing_status": "Disabled",
+    "word_count": 1814,
+    "published_date": "2026-05-06"
   }
 ]
