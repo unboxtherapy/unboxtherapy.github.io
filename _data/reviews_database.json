@@ -5666,5 +5666,18 @@
     "indexing_status": "Disabled",
     "word_count": 1750,
     "published_date": "2026-11-11"
+  },
+  {
+    "timestamp": "2026-11-12T05:54:56.431086",
+    "title": "Product B: Another Title Review",
+    "focus_kw": "Product B: Another Title",
+    "permalink": "creator-b-product-b-another-title-review",
+    "url": "https://unboxtherapy.github.io/creator-b-product-b-another-title-review/",
+    "image_path": "images/creator-b-product-b-another-title-review.webp",
+    "image_url": "https://unboxtherapy.github.io/images/creator-b-product-b-another-title-review.webp",
+    "description": "In today’s fast-paced digital landscape, the quest for efficiency is relentless. Business owners, marketers, and entrepreneurs are constantly seeking ways to reclaim their time, amplify their producti...",
+    "indexing_status": "Disabled",
+    "word_count": 135,
+    "published_date": "2026-11-12"
   }
 ]
